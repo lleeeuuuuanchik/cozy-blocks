@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Уютные блоки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://yandex.ru/games/sdk/v2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/Draggable.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Меню -->
+    <div id="screen-menu" class="screen active">
+      <div class="menu-content">
+        <h1 class="game-title">Уютные блоки</h1>
+        <p class="game-subtitle">Собирай линии и проходи уровни</p>
+        <div id="menu-progress" class="menu-progress">
+          <p>Монеты: <span id="stat-coins">0</span></p>
+          <p>Всего уровней: <span id="stat-levels">0</span></p>
+          <p>Рекорд уровня: <span id="stat-max-level">1</span></p>
+          <p>Всего линий: <span id="stat-lines">0</span></p>
+          <p>Рекорд (бесконечный): <span id="stat-endless">0</span></p>
+        </div>
+        <button id="btn-play" class="btn btn-primary">Играть</button>
+        <button id="btn-endless" class="btn btn-secondary">Бесконечный режим</button>
+        <div class="menu-btns-row">
+          <button id="btn-shop" class="btn btn-secondary">Магазин</button>
+          <button id="btn-themes" class="btn btn-secondary">Темы</button>
+        </div>
+        <div class="menu-btns-row">
+          <button id="btn-achievements" class="btn btn-secondary">Достижения</button>
+          <button id="btn-instructions" class="btn btn-secondary">Как играть</button>
+        </div>
+        <div class="menu-credits">
+          <p>Использованы ассеты:</p>
+          <ul>
+            <li><a href="https://opengameart.org/content/puzzle-game-blocks" target="_blank" rel="noopener">Puzzle Game Blocks (OGA, CC0)</a></li>
+            <li><a href="https://opengameart.org/content/match-3-game-blocks-tiles" target="_blank" rel="noopener">Match 3 Game Blocks Tiles — limbusdev/Georg Eckert (OGA, GPL 3.0)</a></li>
+            <li><a href="https://potat0master.itch.io/free-character-sprite-for-visual-novels" target="_blank" rel="noopener">Keiko (Potat0Master)</a></li>
+            <li><a href="https://noranekogames.itch.io/natsumi" target="_blank" rel="noopener">Natsumi — Noraneko Games</a></li>
+            <li><a href="https://noranekogames.itch.io/miho" target="_blank" rel="noopener">Miho — Noraneko Games</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Игровой экран -->
+    <div id="screen-game" class="screen">
+      <div class="game-header">
+        <div class="header-row">
+          <span>Уровень <span id="level-num">1</span></span>
+          <span>Очки: <span id="score">0</span></span>
+          <span>Монеты: <span id="game-coins">0</span></span>
+        </div>
+        <div class="header-row goal-row">
+          <span id="goal-text">Цель: очисти 5 линий</span>
+          <span id="combo-counter" class="combo-counter" style="display:none">Комбо x<span id="combo-num">1</span></span>
+        </div>
+        <!-- Grid fill meter -->
+        <div class="grid-fill-bar">
+          <span class="grid-fill-label">Поле: <span id="grid-fill-percent">0%</span></span>
+          <div class="grid-fill-track"><div id="grid-fill-bar-fill" class="grid-fill-fill"></div></div>
+        </div>
+        <!-- Fever bar -->
+        <div id="fever-bar" class="fever-bar" style="display:none">
+          <div class="fever-bar-label">FEVER x3</div>
+          <div class="fever-bar-track"><div id="fever-bar-fill" class="fever-bar-fill"></div></div>
+        </div>
+      </div>
+      <div class="game-area">
+        <div id="game-canvas-wrap" class="game-canvas-wrap">
+          <canvas id="game-canvas" width="300" height="300"></canvas>
+          <canvas id="place-preview-canvas" class="place-preview-canvas" width="300" height="300"></canvas>
+          <canvas id="particle-canvas" class="particle-canvas" width="300" height="300"></canvas>
+        </div>
+        <div class="shapes-row">
+          <div class="shape-slot">
+            <span class="shape-slot-label">Запас</span>
+            <div id="hold-shape-container" class="shape-container hold-container">
+              <canvas id="hold-canvas" width="90" height="90"></canvas>
+            </div>
+          </div>
+          <div class="shape-slot shape-slot-main">
+            <span class="shape-slot-label">Фигура</span>
+            <div id="current-shape-container" class="shape-container current-container">
+              <canvas id="current-shape-canvas" width="90" height="90"></canvas>
+            </div>
+            <div class="shape-actions">
+              <button id="btn-rotate" class="btn btn-icon" title="Повернуть">↻</button>
+              <button id="btn-undo" class="btn btn-icon btn-undo" title="Отмена">↩ <span id="undo-count" class="undo-count">3</span></button>
+              <button id="btn-undo-ad" class="btn btn-icon btn-undo-ad" title="Ещё возвраты" style="display:none">▶</button>
+            </div>
+          </div>
+          <div class="shape-slot">
+            <span class="shape-slot-label">Далее</span>
+            <div class="shape-container next-container">
+              <canvas id="next-canvas" width="90" height="90"></canvas>
+            </div>
+          </div>
+          <div class="shape-slot shape-slot-small">
+            <span class="shape-slot-label">Потом</span>
+            <div class="shape-container next2-container">
+              <canvas id="next2-canvas" width="60" height="60"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="game-footer">
+        <button id="btn-lucky-spin" class="btn btn-lucky-spin" title="Крутить рулетку">🎰 Рулетка (<span id="spin-cost">30</span>)</button>
+        <button id="btn-restart" class="btn btn-secondary">Заново</button>
+      </div>
+    </div>
+
+    <!-- Победа уровня -->
+    <div id="screen-level-win" class="screen">
+      <div class="modal-content">
+        <h2>Уровень пройден!</h2>
+        <p>Очки: <span id="win-score">0</span></p>
+        <div id="win-unlocks" class="win-unlocks" style="display: none;"></div>
+        <button id="btn-next-level" class="btn btn-primary">Следующий уровень</button>
+      </div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="screen-gameover" class="screen">
+      <div class="modal-content">
+        <h2>Нет хода</h2>
+        <p>Фигуру поставить некуда. Очки: <span id="gameover-score">0</span></p>
+        <button id="btn-retry" class="btn btn-primary">Заново</button>
+        <button id="btn-to-menu" class="btn btn-secondary">В меню</button>
+      </div>
+    </div>
+
+    <!-- Магазин скинов -->
+    <div id="screen-shop" class="screen">
+      <div class="modal-content modal-content--wide">
+        <h2>Магазин блоков</h2>
+        <p class="shop-coins">Монеты: <span id="shop-coins">0</span></p>
+        <div id="shop-list" class="shop-list"></div>
+        <button id="btn-shop-back" class="btn btn-primary">Назад</button>
+      </div>
+    </div>
+
+    <!-- Достижения -->
+    <div id="screen-achievements" class="screen">
+      <div class="modal-content modal-content--wide">
+        <h2>Достижения</h2>
+        <div id="achievements-grid" class="achievements-grid"></div>
+        <button id="btn-achievements-back" class="btn btn-primary">Назад</button>
+      </div>
+    </div>
+
+    <!-- Выбор темы -->
+    <div id="screen-themes" class="screen">
+      <div class="modal-content modal-content--wide">
+        <h2>Выбор темы</h2>
+        <p class="theme-hint">Разблокируй темы через достижения</p>
+        <div id="themes-grid" class="themes-grid"></div>
+        <button id="btn-themes-back" class="btn btn-primary">Назад</button>
+      </div>
+    </div>
+
+    <!-- Инструкции -->
+    <div id="screen-instructions" class="screen">
+      <div class="modal-content modal-content--wide instructions-content">
+        <h2>Как играть</h2>
+        <div class="instructions-sections">
+          <div class="instruction-block">
+            <div class="instruction-icon">🧩</div>
+            <h3>Основы</h3>
+            <p>Размещай фигуры на поле 10×10. Заполни целую строку или столбец — и они очистятся!</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">🎯</div>
+            <h3>Цель</h3>
+            <p>Очищай нужное количество линий, чтобы пройти уровень. С каждым уровнем цель растёт.</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">🔥</div>
+            <h3>Комбо и Fever</h3>
+            <p>Очищай линии подряд — комбо увеличивает очки! 4 комбо подряд = Fever Mode (×3 очков на 20 сек).</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">↻</div>
+            <h3>Поворот</h3>
+            <p>Нажми кнопку ↻ чтобы повернуть текущую фигуру на 90°.</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">📦</div>
+            <h3>Запас (Hold)</h3>
+            <p>Нажми на ячейку «Запас» чтобы сохранить фигуру на потом. Можно менять 1 раз за ход.</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">↩</div>
+            <h3>Отмена (Undo)</h3>
+            <p>3 бесплатных отмены за игру. Ещё 3 — после просмотра рекламы.</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">💣</div>
+            <h3>Бомбы</h3>
+            <p>Иногда выпадает бомба — она очищает область 3×3 вокруг точки размещения!</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">⭐</div>
+            <h3>Звёзды</h3>
+            <p>На поле появляются звёзды. Накрой их фигурой — получишь бонусные монеты!</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">🎰</div>
+            <h3>Рулетка</h3>
+            <p>Потрать 30 монет на случайный бонус: дополнительный undo, бомба или множитель очков!</p>
+          </div>
+          <div class="instruction-block">
+            <div class="instruction-icon">♾️</div>
+            <h3>Бесконечный режим</h3>
+            <p>Без уровней — играй, пока есть ходы. Набери максимальный счёт!</p>
+          </div>
+        </div>
+        <button id="btn-instructions-back" class="btn btn-primary">Назад</button>
+      </div>
+    </div>
+
+    <!-- Lucky Spin результат -->
+    <div id="spin-result" class="spin-result hidden">
+      <div class="spin-result-card">
+        <div id="spin-result-icon" class="spin-result-icon"></div>
+        <div id="spin-result-text" class="spin-result-text"></div>
+      </div>
+    </div>
+
+    <!-- Сообщение персонажа (overlay) -->
+    <div id="character-message" class="character-message hidden">
+      <div class="char-card">
+        <span class="char-name-badge"></span>
+        <img class="character-avatar" src="" alt="" />
+      </div>
+      <div class="message-bubble">
+        <div class="char-bubble-tail"></div>
+        <p class="message-text"></p>
+      </div>
+    </div>
+  </div>
+  <script src="src/config.js"></script>
+  <script src="src/shapes.js"></script>
+  <script src="src/game.js"></script>
+  <script src="src/progress.js"></script>
+  <script src="src/achievements.js"></script>
+  <script src="src/yandex-sdk.js"></script>
+  <script src="src/dialogue.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/particles.js"></script>
+  <script src="src/juice.js"></script>
+  <script src="src/dragdrop.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>

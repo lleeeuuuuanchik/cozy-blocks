@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build / artifacts
+*.zip
+node_modules/
+
+# Local / env
+.env
+.env.local
