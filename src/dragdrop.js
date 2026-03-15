@@ -48,7 +48,12 @@ var DragDrop = {
     var col = Math.floor(((clientX - rect.left) * scaleX) / CONFIG.CELL_SIZE);
     var row = Math.floor(((clientY - rect.top) * scaleY) / CONFIG.CELL_SIZE);
     var size = CONFIG.GRID_SIZE;
-    if (row < 0 || row >= size || col < 0 || col >= size || row !== row || col !== col) return null;
+    if (row !== row || col !== col) return null; // NaN check
+    // Clamp to grid bounds so edge pixels still register
+    if (col < 0) col = 0;
+    if (col >= size) col = size - 1;
+    if (row < 0) row = 0;
+    if (row >= size) row = size - 1;
 
     // Center the shape on the hovered cell
     if (Game.currentShape) {

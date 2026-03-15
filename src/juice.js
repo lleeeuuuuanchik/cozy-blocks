@@ -61,6 +61,23 @@ var Juice = {
   },
 
   /**
+   * Вспышка при взрыве бомбы.
+   */
+  bombFlash: function (el) {
+    if (!el || typeof gsap === 'undefined') return;
+    var flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;inset:0;background:white;pointer-events:none;border-radius:inherit;z-index:10;';
+    el.appendChild(flash);
+    gsap.fromTo(flash,
+      { opacity: 0.7 },
+      { opacity: 0, duration: 0.3, ease: 'power2.out', onComplete: function () {
+        if (flash.parentNode) flash.parentNode.removeChild(flash);
+      }}
+    );
+    this.shake(el, 8, 0.5);
+  },
+
+  /**
    * Пульсация элемента (масштаб).
    * @param {HTMLElement} el
    */

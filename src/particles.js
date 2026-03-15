@@ -57,6 +57,41 @@ var Particles = {
     }
   },
 
+  /**
+   * Взрыв бомбы: кольцо + вспышка + усиленные частицы.
+   */
+  emitExplosion(cx, cy) {
+    var colors = ['#67e8f9', '#ffffff', '#e879f9', '#c084fc'];
+    for (var i = 0; i < 35; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 150 + Math.random() * 100;
+      this.particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.8 + Math.random() * 0.6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 4 + Math.random() * 4,
+      });
+    }
+    // Expanding ring
+    this.particles.push({
+      x: cx, y: cy, vx: 0, vy: 0,
+      life: 1, decay: 2.5,
+      color: '#67e8f9', size: 8,
+      type: 'ring',
+    });
+    // Flash
+    this.particles.push({
+      x: cx, y: cy, vx: 0, vy: 0,
+      life: 1, decay: 5,
+      color: 'rgba(255,255,255,0.7)', size: 0,
+      type: 'flash',
+    });
+    if (!this._running) this._startLoop();
+  },
+
   _startLoop() {
     this._running = true;
     this._lastTime = performance.now();
@@ -79,9 +114,15 @@ var Particles = {
   _update(dt) {
     for (var i = this.particles.length - 1; i >= 0; i--) {
       var p = this.particles[i];
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.vy += 120 * dt; // gravity
+      if (p.type === 'ring') {
+        p.size += 200 * dt;
+      } else if (p.type === 'flash') {
+        // no movement
+      } else {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 120 * dt;
+      }
       p.life -= p.decay * dt;
       if (p.life <= 0) {
         this.particles.splice(i, 1);
@@ -91,13 +132,25 @@ var Particles = {
 
   _draw() {
     if (!this.ctx || !this.canvas) return;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    var ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     for (var i = 0; i < this.particles.length; i++) {
       var p = this.particles[i];
-      this.ctx.globalAlpha = Math.max(0, p.life);
-      this.ctx.fillStyle = p.color;
-      this.ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      ctx.globalAlpha = Math.max(0, p.life);
+      if (p.type === 'ring') {
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (p.type === 'flash') {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      }
     }
-    this.ctx.globalAlpha = 1;
+    ctx.globalAlpha = 1;
   },
 };

@@ -47,20 +47,67 @@ const SHAPES = [
   ],
   // Точка
   [['1']],
+  // Plus (+)
+  [
+    ['0', '1', '0'],
+    ['1', '1', '1'],
+    ['0', '1', '0'],
+  ],
+  // Зеркальный малый L
+  [
+    ['0', '1'],
+    ['1', '1'],
+  ],
+  // Диагональ
+  [
+    ['1', '0'],
+    ['0', '1'],
+  ],
+  // Линия 2
+  [['1', '1']],
+  // Линия 3
+  [['1', '1', '1']],
+  // Плоская T
+  [
+    ['1', '1', '1'],
+    ['0', '1', '0'],
+  ],
+  // U-образная
+  [
+    ['1', '0', '1'],
+    ['1', '1', '1'],
+  ],
+  // Ступеньки
+  [
+    ['1', '0'],
+    ['1', '1'],
+    ['0', '1'],
+  ],
 ];
 
 /** Бомба — одноклеточная фигура, очищает 3×3 */
 const BOMB_SHAPE = [['1']];
 
+/** Магнит — одноклеточная фигура, применяет гравитацию */
+const MAGNET_SHAPE = [['1']];
+
 /**
  * Возвращает копию случайной фигуры из набора.
  * С шансом CONFIG.POWERUP_BOMB_CHANCE возвращает бомбу.
+ * С шансом CONFIG.POWERUP_MAGNET_CHANCE возвращает магнит.
  */
 function getRandomShape() {
-  if (typeof CONFIG !== 'undefined' && CONFIG.POWERUP_BOMB_CHANCE && Math.random() < CONFIG.POWERUP_BOMB_CHANCE) {
+  var rnd = Math.random();
+  if (typeof CONFIG !== 'undefined' && CONFIG.POWERUP_BOMB_CHANCE && rnd < CONFIG.POWERUP_BOMB_CHANCE) {
     var bomb = BOMB_SHAPE.map(function (row) { return [].concat(row); });
     bomb.isBomb = true;
     return bomb;
+  }
+  rnd = Math.random();
+  if (typeof CONFIG !== 'undefined' && CONFIG.POWERUP_MAGNET_CHANCE && rnd < CONFIG.POWERUP_MAGNET_CHANCE) {
+    var magnet = MAGNET_SHAPE.map(function (row) { return [].concat(row); });
+    magnet.isMagnet = true;
+    return magnet;
   }
   const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
   return shape.map(row => [...row]);
@@ -81,6 +128,7 @@ function rotateShapeCW(shape) {
   }
   // Preserve special flags
   if (shape.isBomb) rotated.isBomb = true;
+  if (shape.isMagnet) rotated.isMagnet = true;
   return rotated;
 }
 

@@ -58,6 +58,15 @@ var Render = {
     return Progress.data.equippedPieceSkin || 'default';
   },
 
+  _currentSkinNoTint: function () {
+    var id = this.getEquippedSkinId();
+    var list = typeof PIECE_SKINS !== 'undefined' ? PIECE_SKINS : [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id && list[i].noTint) return true;
+    }
+    return false;
+  },
+
   loadBlockSkin: function () {
     var skinId = this.getEquippedSkinId();
     if (this.blockImageCache[skinId]) {
@@ -117,6 +126,8 @@ var Render = {
   _invalidateCellBuffer: function () {
     this._cellBuffer = null;
     this._bombBuffer = null;
+    this._frozenBuffer = null;
+    this._magnetBuffer = null;
     this._lastThemeId = null;
   },
 
@@ -141,25 +152,118 @@ var Render = {
     this._bombBuffer.height = cellInner;
     this._bombBufferCtx = this._bombBuffer.getContext('2d');
     this._renderCellToBuffer(this._bombBufferCtx, cellInner, true);
+
+    // Create frozen cell buffer (blue overlay on normal cell)
+    this._frozenBuffer = document.createElement('canvas');
+    this._frozenBuffer.width = cellInner;
+    this._frozenBuffer.height = cellInner;
+    var frozenCtx = this._frozenBuffer.getContext('2d');
+    this._renderCellToBuffer(frozenCtx, cellInner, false);
+    // Add ice overlay
+    frozenCtx.globalCompositeOperation = 'source-atop';
+    frozenCtx.fillStyle = 'rgba(103, 232, 249, 0.45)';
+    frozenCtx.fillRect(0, 0, cellInner, cellInner);
+    frozenCtx.globalCompositeOperation = 'source-over';
+    // Ice border
+    frozenCtx.strokeStyle = 'rgba(103, 232, 249, 0.7)';
+    frozenCtx.lineWidth = 1.5;
+    this._drawRoundedRect(frozenCtx, 0, 0, cellInner, cellInner, 4);
+    frozenCtx.stroke();
+
+    // Create magnet cell buffer
+    this._magnetBuffer = document.createElement('canvas');
+    this._magnetBuffer.width = cellInner;
+    this._magnetBuffer.height = cellInner;
+    var magnetCtx = this._magnetBuffer.getContext('2d');
+    this._renderCellToBuffer(magnetCtx, cellInner, false, true);
+    this._drawMagnetIcon(magnetCtx, 0, 0, cellInner);
   },
 
-  _renderCellToBuffer: function (ctx, cellInner, isBomb) {
+  _renderCellToBuffer: function (ctx, cellInner, isBomb, isMagnet) {
     var theme = this.getThemeObj();
     var radius = 4;
     ctx.clearRect(0, 0, cellInner, cellInner);
     ctx.save();
-    ctx.shadowColor = isBomb ? '#67e8f9' : theme.glow;
-    ctx.shadowBlur = isBomb ? 14 : 8;
+    ctx.shadowColor = isBomb ? '#67e8f9' : (isMagnet ? 'rgba(232, 121, 249, 0.6)' : theme.glow);
+    ctx.shadowBlur = isBomb ? 14 : (isMagnet ? 12 : 8);
 
     if (this.blockImage && this.blockImage.width && this.blockImage.height) {
       this._drawRoundedRect(ctx, 0, 0, cellInner, cellInner, radius);
       ctx.clip();
       this._drawCellImage(ctx, this.blockImage, 0, 0, cellInner, cellInner);
+      if (!isBomb && !isMagnet && !this._currentSkinNoTint()) {
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = theme.cell;
+        ctx.fillRect(0, 0, cellInner, cellInner);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      if (isMagnet) {
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = '#e879f9';
+        ctx.fillRect(0, 0, cellInner, cellInner);
+        ctx.globalCompositeOperation = 'source-over';
+      }
     } else {
       this._drawRoundedRect(ctx, 0, 0, cellInner, cellInner, radius);
-      ctx.fillStyle = isBomb ? '#67e8f9' : theme.cell;
+      ctx.fillStyle = isBomb ? '#67e8f9' : (isMagnet ? '#e879f9' : theme.cell);
       ctx.fill();
     }
+    ctx.restore();
+    if (isBomb) this._drawBombIcon(ctx, 0, 0, cellInner);
+  },
+
+  _drawBombIcon: function (ctx, x, y, size) {
+    var cx = x + size / 2;
+    var cy = y + size / 2;
+    var r = size * 0.28;
+    ctx.save();
+    // Body
+    ctx.fillStyle = '#1a1825';
+    ctx.beginPath();
+    ctx.arc(cx, cy + 1, r, 0, Math.PI * 2);
+    ctx.fill();
+    // Fuse
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + r * 0.5, cy - r * 0.7);
+    ctx.quadraticCurveTo(cx + r * 1.1, cy - r * 1.4, cx + r * 0.3, cy - r * 1.5);
+    ctx.stroke();
+    // Spark
+    ctx.fillStyle = '#fbbf24';
+    ctx.shadowColor = 'rgba(251, 191, 36, 0.8)';
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.arc(cx + r * 0.3, cy - r * 1.5, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  },
+
+  _drawMagnetIcon: function (ctx, x, y, size) {
+    var cx = x + size / 2;
+    var cy = y + size / 2;
+    var r = size * 0.3;
+    ctx.save();
+    // Horseshoe arc
+    ctx.strokeStyle = '#c084fc';
+    ctx.lineWidth = size * 0.12;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(cx, cy - 1, r, Math.PI, 0);
+    ctx.stroke();
+    // Left leg
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = size * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(cx - r, cy - 1);
+    ctx.lineTo(cx - r, cy + r * 0.8);
+    ctx.stroke();
+    // Right leg
+    ctx.strokeStyle = '#3b82f6';
+    ctx.beginPath();
+    ctx.moveTo(cx + r, cy - 1);
+    ctx.lineTo(cx + r, cy + r * 0.8);
+    ctx.stroke();
     ctx.restore();
   },
 
@@ -192,12 +296,10 @@ var Render = {
     pCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
 
     var color = canPlace !== false ? '#4ade80' : '#f87171';
-    var alpha = canPlace !== false ? 0.35 : 0.2;
     var strokeAlpha = canPlace !== false ? 0.7 : 0.4;
 
-    pCtx.fillStyle = color;
-    pCtx.strokeStyle = color;
-    pCtx.lineWidth = 1.5;
+    this._ensureCellBuffer();
+    var buf = shape.isBomb ? this._bombBuffer : (shape.isMagnet ? this._magnetBuffer : this._cellBuffer);
 
     for (var r = 0; r < h; r++) {
       for (var c = 0; c < w; c++) {
@@ -205,13 +307,23 @@ var Render = {
           var cellRow = row + r;
           var cellCol = col + c;
           if (cellRow < 0 || cellRow >= CONFIG.GRID_SIZE || cellCol < 0 || cellCol >= CONFIG.GRID_SIZE) continue;
-          var x = cellCol * cell + 2;
-          var y = cellRow * cell + 2;
-          var d = cell - 4;
-          pCtx.globalAlpha = alpha;
-          this._drawRoundedRect(pCtx, x, y, d, d, 4);
-          pCtx.fill();
+          var x = cellCol * cell + 1;
+          var y = cellRow * cell + 1;
+          var d = cell - 2;
+          // Ghost texture
+          if (canPlace !== false && buf) {
+            pCtx.globalAlpha = 0.3;
+            pCtx.drawImage(buf, x, y);
+          } else {
+            pCtx.globalAlpha = 0.2;
+            pCtx.fillStyle = color;
+            this._drawRoundedRect(pCtx, x, y, d, d, 4);
+            pCtx.fill();
+          }
+          // Outline
           pCtx.globalAlpha = strokeAlpha;
+          pCtx.strokeStyle = color;
+          pCtx.lineWidth = 1.5;
           this._drawRoundedRect(pCtx, x, y, d, d, 4);
           pCtx.stroke();
         }
@@ -274,11 +386,12 @@ var Render = {
     var cell = CONFIG.CELL_SIZE;
     var totalPx = size * cell;
 
-    // Dark background
-    ctx.fillStyle = '#1a1825';
+    // Dark background (theme-aware)
+    var theme = this.getThemeObj();
+    ctx.fillStyle = theme.gridBg || '#1a1825';
     ctx.fillRect(0, 0, totalPx, totalPx);
 
-    // Subtle grid lines — batch into single path
+    // Subtle grid lines — batch into single path (theme-aware)
     ctx.beginPath();
     for (var i = 0; i <= size; i++) {
       var pos = i * cell;
@@ -287,7 +400,7 @@ var Render = {
       ctx.moveTo(0, pos);
       ctx.lineTo(totalPx, pos);
     }
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.strokeStyle = theme.gridLine || 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
@@ -301,9 +414,12 @@ var Render = {
       var gridRow = Game.grid[row];
       if (!gridRow) continue;
       for (var col = 0; col < size; col++) {
-        if (gridRow[col] !== 0) {
-          var isBomb = gridRow[col] === 2;
-          var buf = isBomb ? this._bombBuffer : this._cellBuffer;
+        var cellVal = gridRow[col];
+        if (cellVal !== 0) {
+          var buf;
+          if (cellVal === 3) buf = this._frozenBuffer;
+          else if (cellVal === 2) buf = this._bombBuffer;
+          else buf = this._cellBuffer;
           if (buf) {
             ctx.drawImage(buf, col * cell + 1, row * cell + 1);
           }
@@ -378,12 +494,21 @@ var Render = {
             this._drawRoundedRect(ctx, x, y, ci, ci, 3);
             ctx.clip();
             this._drawCellImage(ctx, this.blockImage, x, y, ci, ci);
+            if (!isBomb && !shape.isMagnet && !this._currentSkinNoTint()) {
+              ctx.globalCompositeOperation = 'multiply';
+              ctx.fillStyle = theme.cell;
+              ctx.fillRect(x, y, ci, ci);
+              ctx.globalCompositeOperation = 'source-over';
+            }
           } else {
             this._drawRoundedRect(ctx, x, y, ci, ci, 3);
-            ctx.fillStyle = isBomb ? '#67e8f9' : theme.cell;
+            ctx.fillStyle = isBomb ? '#67e8f9' : (shape.isMagnet ? '#e879f9' : theme.cell);
             ctx.fill();
           }
           ctx.restore();
+          // Icon overlays for small canvases
+          if (isBomb) this._drawBombIcon(ctx, x, y, ci);
+          if (shape.isMagnet) this._drawMagnetIcon(ctx, x, y, ci);
         }
       }
     }
@@ -407,6 +532,71 @@ var Render = {
   drawHoldShape: function () {
     if (!this.holdCtx || !this.holdCanvas) return;
     this._drawShapeInCanvas(this.holdCtx, this.holdCanvas, Game.heldShape || null);
+  },
+
+  animateGravity: function (moves, callback) {
+    if (!moves || moves.length === 0) {
+      this.drawAll();
+      if (callback) callback();
+      return;
+    }
+    var self = this;
+    var cell = CONFIG.CELL_SIZE;
+    var duration = 300;
+    var startTime = performance.now();
+    var pCtx = this.previewCtx;
+    var pCanvas = this.previewCanvas;
+
+    function animate(now) {
+      var t = Math.min(1, (now - startTime) / duration);
+      var ease = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      if (pCtx && pCanvas) {
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        pCtx.globalAlpha = 0.3 * (1 - t);
+        for (var i = 0; i < moves.length; i++) {
+          var m = moves[i];
+          var curY = m.fromRow * cell + (m.toRow - m.fromRow) * cell * ease;
+          var x = m.fromCol * cell + 1;
+          pCtx.fillStyle = 'rgba(103, 232, 249, 0.4)';
+          self._drawRoundedRect(pCtx, x, curY + 1, cell - 2, cell - 2, 4);
+          pCtx.fill();
+        }
+        pCtx.globalAlpha = 1;
+      }
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        if (pCtx && pCanvas) pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        self.drawAll();
+        if (callback) callback();
+      }
+    }
+    self.drawAll();
+    requestAnimationFrame(animate);
+  },
+
+  drawRowHighlight: function (row) {
+    if (!this.previewCtx || !this.previewCanvas) return;
+    var pCtx = this.previewCtx;
+    var cell = CONFIG.CELL_SIZE;
+    var size = CONFIG.GRID_SIZE;
+    pCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
+    pCtx.globalAlpha = 0.25;
+    pCtx.fillStyle = '#f87171';
+    pCtx.fillRect(0, row * cell, size * cell, cell);
+    pCtx.globalAlpha = 1;
+  },
+
+  drawColHighlight: function (col) {
+    if (!this.previewCtx || !this.previewCanvas) return;
+    var pCtx = this.previewCtx;
+    var cell = CONFIG.CELL_SIZE;
+    var size = CONFIG.GRID_SIZE;
+    pCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
+    pCtx.globalAlpha = 0.25;
+    pCtx.fillStyle = '#f87171';
+    pCtx.fillRect(col * cell, 0, cell, size * cell);
+    pCtx.globalAlpha = 1;
   },
 
   updateUI: function () {
@@ -460,5 +650,32 @@ var Render = {
     var fillPct = Game.getGridFillPercent();
     if (fillEl) fillEl.textContent = fillPct + '%';
     if (fillBar) fillBar.style.width = fillPct + '%';
+
+    // Danger zone glow when grid > 70%
+    var wrap = document.getElementById('game-canvas-wrap');
+    if (wrap) {
+      if (fillPct >= 70) {
+        wrap.classList.add('danger-zone');
+      } else {
+        wrap.classList.remove('danger-zone');
+      }
+    }
+
+    // Multiplier bar
+    var multBar = document.getElementById('multiplier-bar');
+    var multFill = document.getElementById('multiplier-bar-fill');
+    var multLabel = document.getElementById('multiplier-label');
+    if (multBar && multFill) {
+      var max = CONFIG.MULTIPLIER_BAR_MAX || 5;
+      var pct = Math.min(100, Math.round((Game.multiplierBar / max) * 100));
+      multFill.style.width = pct + '%';
+      if (Game.multiplierActive) {
+        multBar.classList.add('multiplier-ready');
+        if (multLabel) multLabel.textContent = 'x2 ГОТОВ!';
+      } else {
+        multBar.classList.remove('multiplier-ready');
+        if (multLabel) multLabel.textContent = Game.multiplierBar + '/' + max;
+      }
+    }
   },
 };

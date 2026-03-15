@@ -26,6 +26,15 @@ const Progress = {
       bestEndlessScore: 0,
       lastDailyDate: '',
       totalGamesPlayed: 0,
+      bestGravityScore: 0,
+      dailyChallenges: null,
+      dailyChallengesDate: '',
+      weeklyScores: [],
+      weeklyResetDate: '',
+      bestTimeAttackScore: 0,
+      loginStreak: 0,
+      lastLoginDate: '',
+      completedPuzzles: [],
     };
   },
 
@@ -159,19 +168,136 @@ const Progress = {
   },
 
   checkDailyBonus: function () {
+    var result = this.checkLoginStreak();
+    return result.reward;
+  },
+
+  checkLoginStreak: function () {
     if (!this.data) this.load();
     var today = new Date().toISOString().slice(0, 10);
-    if (this.data.lastDailyDate === today) return 0;
+    if (this.data.lastLoginDate === today) {
+      return { streak: this.data.loginStreak || 0, reward: 0, isNew: false };
+    }
+    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if (this.data.lastLoginDate === yesterday) {
+      this.data.loginStreak = Math.min((this.data.loginStreak || 0) + 1, 7);
+    } else {
+      this.data.loginStreak = 1;
+    }
+    this.data.lastLoginDate = today;
     this.data.lastDailyDate = today;
-    var bonus = 25;
-    this.data.coins = (this.data.coins || 0) + bonus;
+    var rewards = (typeof CONFIG !== 'undefined' && CONFIG.STREAK_REWARDS) ? CONFIG.STREAK_REWARDS : [30, 50, 80, 120, 200, 300, 500];
+    var reward = rewards[Math.min(this.data.loginStreak - 1, rewards.length - 1)];
+    this.data.coins = (this.data.coins || 0) + reward;
     this.save();
-    return bonus;
+    return { streak: this.data.loginStreak, reward: reward, isNew: true };
   },
 
   incrementGamesPlayed: function () {
     if (!this.data) this.load();
     this.data.totalGamesPlayed = (this.data.totalGamesPlayed || 0) + 1;
     this.save();
+  },
+
+  updateBestGravity: function (score) {
+    if (!this.data) this.load();
+    if (score > (this.data.bestGravityScore || 0)) {
+      this.data.bestGravityScore = score;
+      this.save();
+    }
+  },
+
+  updateBestTimeAttack: function (score) {
+    if (!this.data) this.load();
+    if (score > (this.data.bestTimeAttackScore || 0)) {
+      this.data.bestTimeAttackScore = score;
+      this.save();
+    }
+  },
+
+  // === Daily Challenges ===
+  getDailyChallenges: function () {
+    if (!this.data) this.load();
+    var today = new Date().toISOString().slice(0, 10);
+    if (this.data.dailyChallengesDate === today && this.data.dailyChallenges) {
+      return this.data.dailyChallenges;
+    }
+    // Generate 3 random challenges
+    var templates = typeof DAILY_CHALLENGE_TEMPLATES !== 'undefined' ? DAILY_CHALLENGE_TEMPLATES : [];
+    var shuffled = templates.slice().sort(function () { return Math.random() - 0.5; });
+    var picked = shuffled.slice(0, 3);
+    var challenges = [];
+    for (var i = 0; i < picked.length; i++) {
+      challenges.push({ id: picked[i].id, text: picked[i].text, target: picked[i].target, type: picked[i].type, reward: picked[i].reward, progress: 0, completed: false });
+    }
+    this.data.dailyChallenges = challenges;
+    this.data.dailyChallengesDate = today;
+    this.save();
+    return challenges;
+  },
+
+  updateChallengeProgress: function (type, value) {
+    if (!this.data) this.load();
+    var challenges = this.data.dailyChallenges;
+    if (!challenges) return [];
+    var completed = [];
+    for (var i = 0; i < challenges.length; i++) {
+      var ch = challenges[i];
+      if (ch.completed || ch.type !== type) continue;
+      ch.progress = Math.max(ch.progress, value);
+      if (ch.progress >= ch.target) {
+        ch.completed = true;
+        this.data.coins = (this.data.coins || 0) + ch.reward;
+        completed.push(ch);
+      }
+    }
+    if (completed.length > 0) this.save();
+    return completed;
+  },
+
+  // === Weekly Leaderboard ===
+  getWeeklyScores: function () {
+    if (!this.data) this.load();
+    this._checkWeeklyReset();
+    return this.data.weeklyScores || [];
+  },
+
+  addWeeklyScore: function (score, mode) {
+    if (!this.data) this.load();
+    this._checkWeeklyReset();
+    var scores = this.data.weeklyScores || [];
+    scores.push({ score: score, mode: mode || 'classic', date: new Date().toISOString().slice(0, 10) });
+    scores.sort(function (a, b) { return b.score - a.score; });
+    this.data.weeklyScores = scores.slice(0, 10);
+    this.save();
+  },
+
+  isPuzzleCompleted: function (puzzleId) {
+    if (!this.data) this.load();
+    return (this.data.completedPuzzles || []).indexOf(puzzleId) !== -1;
+  },
+
+  completePuzzle: function (puzzleId, reward) {
+    if (!this.data) this.load();
+    if ((this.data.completedPuzzles || []).indexOf(puzzleId) === -1) {
+      if (!this.data.completedPuzzles) this.data.completedPuzzles = [];
+      this.data.completedPuzzles.push(puzzleId);
+      this.data.coins = (this.data.coins || 0) + (reward || 0);
+      this.save();
+      return true;
+    }
+    return false;
+  },
+
+  _checkWeeklyReset: function () {
+    var now = new Date();
+    var monday = new Date(now);
+    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    var mondayStr = monday.toISOString().slice(0, 10);
+    if (this.data.weeklyResetDate !== mondayStr) {
+      this.data.weeklyScores = [];
+      this.data.weeklyResetDate = mondayStr;
+      this.save();
+    }
   },
 };

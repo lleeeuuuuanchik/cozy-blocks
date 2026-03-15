@@ -1,7 +1,9 @@
 /**
  * Ядро игры: сетка, фигуры, размещение, очистка линий, уровни.
- * Комбо-серия, запас (hold), отмена (undo), бомба, fever, звёзды, очередь фигур.
- * Бесконечный режим, измерение заполненности поля.
+ * Комбо-серия, запас (hold), отмена (undo), бомба, магнит, fever, звёзды, очередь фигур.
+ * Бесконечный режим, режим гравитации, замороженные блоки.
+ *
+ * Grid cell values: 0=empty, 1=filled, 2=bomb-placed (unused), 3=frozen
  */
 const Game = {
   grid: null,
@@ -15,8 +17,9 @@ const Game = {
   isGameOver: false,
   linesClearedThisGame: 0,
 
-  // Endless mode
+  // Modes
   isEndless: false,
+  isGravity: false,
 
   // Combo streak
   comboCounter: 0,
@@ -43,8 +46,20 @@ const Game = {
   multiplierBar: 0,
   multiplierActive: false,
 
-  init: function (endless) {
+  // Session tracking for daily challenges
+  _sessionStars: 0,
+  _sessionGames: 0,
+
+  isPuzzle: false,
+  puzzleData: null,
+  movesRemaining: 0,
+
+  init: function (endless, gravity) {
     this.isEndless = !!endless;
+    this.isGravity = !!gravity;
+    this.isPuzzle = false;
+    this.puzzleData = null;
+    this.movesRemaining = 0;
     this.grid = this.createEmptyGrid();
     this.score = 0;
     this.level = 1;
@@ -65,6 +80,7 @@ const Game = {
     this.bombsUsedThisGame = 0;
     this.multiplierBar = 0;
     this.multiplierActive = false;
+    this._sessionStars = 0;
     this.nextShape2 = getRandomShape();
     this.nextShape = getRandomShape();
     this.spawnNextShape();
@@ -102,10 +118,6 @@ const Game = {
     }
   },
 
-  /**
-   * Возвращает реальные границы '1'-ячеек в матрице фигуры.
-   * { minR, maxR, minC, maxC } — смещения внутри матрицы.
-   */
   _shapeBounds: function (shape) {
     var h = shape.length;
     var w = shape[0].length;
@@ -144,7 +156,6 @@ const Game = {
   canPlaceAnywhere: function (shape) {
     var size = CONFIG.GRID_SIZE;
     var b = this._shapeBounds(shape);
-    // Origin can range so that all '1' cells stay within grid
     var minRow = -b.minR;
     var maxRow = size - 1 - b.maxR;
     var minCol = -b.minC;
@@ -160,13 +171,10 @@ const Game = {
   getPlacementOrigin: function (row, col, shape) {
     var size = CONFIG.GRID_SIZE;
     var b = this._shapeBounds(shape);
-    // Center on the actual '1' cells, not the full matrix
     var realH = b.maxR - b.minR + 1;
     var realW = b.maxC - b.minC + 1;
-    // Cursor cell should be center of real shape content
     var r = row - b.minR - Math.floor(realH / 2);
     var c = col - b.minC - Math.floor(realW / 2);
-    // Clamp so all '1' cells stay within grid
     if (r + b.minR < 0) r = -b.minR;
     if (c + b.minC < 0) c = -b.minC;
     if (r + b.maxR >= size) r = size - 1 - b.maxR;
@@ -188,6 +196,11 @@ const Game = {
       hasHeldThisTurn: this.hasHeldThisTurn,
       starCells: this.starCells.slice(),
       bombsUsedThisGame: this.bombsUsedThisGame,
+      level: this.level,
+      linesGoal: this.linesGoal,
+      multiplierBar: this.multiplierBar,
+      multiplierActive: this.multiplierActive,
+      feverActive: this.feverActive,
     };
   },
 
@@ -206,6 +219,11 @@ const Game = {
     this.hasHeldThisTurn = this._undoState.hasHeldThisTurn;
     this.starCells = this._undoState.starCells;
     this.bombsUsedThisGame = this._undoState.bombsUsedThisGame;
+    this.level = this._undoState.level;
+    this.linesGoal = this._undoState.linesGoal;
+    this.multiplierBar = this._undoState.multiplierBar;
+    this.multiplierActive = this._undoState.multiplierActive;
+    this.feverActive = this._undoState.feverActive;
     this.isGameOver = false;
     this.canUndo = false;
     this._undoState = null;
@@ -240,6 +258,7 @@ const Game = {
 
     var shape = this.currentShape;
     var isBomb = !!shape.isBomb;
+    var isMagnet = !!shape.isMagnet;
     var h = shape.length;
     var w = shape[0].length;
 
@@ -261,10 +280,13 @@ const Game = {
       }
       this.canUndo = true;
       var feverTriggered = this.checkFever();
+      var gravMoves = [];
+      if (this.isGravity) gravMoves = this._applyGravity() || [];
       this.spawnNextShape();
-      return { placed: true, linesCleared: linesCleared, clearedCells: clearedCells, points: points, isBomb: true, starsCollected: [], feverTriggered: feverTriggered };
+      return { placed: true, linesCleared: linesCleared, clearedCells: clearedCells, points: points, isBomb: true, isMagnet: false, starsCollected: [], feverTriggered: feverTriggered, gravityMoves: gravMoves };
     }
 
+    // Place cells
     for (var r = 0; r < h; r++) {
       for (var c = 0; c < w; c++) {
         if (shape[r][c] === '1') {
@@ -274,8 +296,39 @@ const Game = {
       }
     }
 
+    // Magnet: apply gravity after placing
+    var gravMoves = [];
+    if (isMagnet) {
+      gravMoves = this._applyGravity() || [];
+    }
+
+    // Gravity mode: always apply gravity after placement
+    if (this.isGravity) {
+      var gm = this._applyGravity() || [];
+      gravMoves = gravMoves.concat(gm);
+    }
+
     var cellsToClear = this._findCellsToClear();
     var linesCleared = this._clearLines(cellsToClear);
+
+    // Cascade: in gravity mode, repeat gravity+clear until no more lines
+    var cascadeCount = 0;
+    if ((this.isGravity || isMagnet) && linesCleared > 0) {
+      var keepGoing = true;
+      while (keepGoing) {
+        var gm2 = this._applyGravity() || [];
+        gravMoves = gravMoves.concat(gm2);
+        var moreCells = this._findCellsToClear();
+        var moreLines = this._clearLines(moreCells);
+        if (moreLines > 0) {
+          cascadeCount++;
+          linesCleared += moreLines;
+          cellsToClear = cellsToClear.concat(moreCells);
+        } else {
+          keepGoing = false;
+        }
+      }
+    }
 
     if (linesCleared > 0) {
       this.comboCounter++;
@@ -285,20 +338,49 @@ const Game = {
 
     var points = this.calcPoints(linesCleared);
     points = Math.floor(points * this.getFeverMultiplier());
+    // Apply multiplier bar bonus
+    if (this.multiplierActive) {
+      points = Math.floor(points * (CONFIG.MULTIPLIER_BAR_BONUS || 2));
+      this.multiplierActive = false;
+    }
+    // Fill multiplier bar
+    if (linesCleared > 0) {
+      this.multiplierBar += linesCleared;
+      var max = CONFIG.MULTIPLIER_BAR_MAX || 5;
+      if (this.multiplierBar >= max) {
+        this.multiplierBar = 0;
+        this.multiplierActive = true;
+      }
+    }
+    // Cascade bonus points
+    if (cascadeCount > 0) {
+      points += cascadeCount * CONFIG.POINTS_PER_LINE;
+    }
     this.score += points;
     this.linesClearedThisLevel += linesCleared;
     this.linesClearedThisGame += linesCleared;
     this.canUndo = true;
 
-    if (starsCollected.length > 0 && typeof Progress !== 'undefined') {
-      var starBonus = starsCollected.length * CONFIG.STAR_BONUS_COINS;
-      Progress.data.coins = (Progress.data.coins || 0) + starBonus;
-      Progress.save();
+    // Puzzle mode: decrement moves
+    if (this.isPuzzle) {
+      this.movesRemaining--;
+      if (this.movesRemaining <= 0 && !this.isPuzzleComplete()) {
+        this.isGameOver = true;
+      }
+    }
+
+    if (starsCollected.length > 0) {
+      this._sessionStars += starsCollected.length;
+      if (typeof Progress !== 'undefined') {
+        var starBonus = starsCollected.length * CONFIG.STAR_BONUS_COINS;
+        Progress.data.coins = (Progress.data.coins || 0) + starBonus;
+        Progress.save();
+      }
     }
 
     var feverTriggered = this.checkFever();
     this.spawnNextShape();
-    return { placed: true, linesCleared: linesCleared, clearedCells: cellsToClear, points: points, isBomb: false, starsCollected: starsCollected, feverTriggered: feverTriggered };
+    return { placed: true, linesCleared: linesCleared, clearedCells: cellsToClear, points: points, isBomb: false, isMagnet: isMagnet, starsCollected: starsCollected, feverTriggered: feverTriggered, gravityMoves: gravMoves, cascadeCount: cascadeCount };
   },
 
   _applyBomb: function (row, col) {
@@ -313,6 +395,61 @@ const Game = {
       }
     }
     return cleared;
+  },
+
+  // === Gravity ===
+  _applyGravity: function () {
+    var size = CONFIG.GRID_SIZE;
+    var moves = [];
+    for (var col = 0; col < size; col++) {
+      var writeRow = size - 1;
+      for (var row = size - 1; row >= 0; row--) {
+        if (this.grid[row][col] !== 0) {
+          var val = this.grid[row][col];
+          if (row !== writeRow) {
+            this.grid[writeRow][col] = val;
+            this.grid[row][col] = 0;
+            moves.push({ fromRow: row, fromCol: col, toRow: writeRow, toCol: col });
+          }
+          writeRow--;
+        }
+      }
+    }
+    return moves;
+  },
+
+  // === Power-up: clear row/col, shuffle ===
+  clearRow: function (rowIndex) {
+    var size = CONFIG.GRID_SIZE;
+    var cleared = [];
+    if (rowIndex < 0 || rowIndex >= size) return cleared;
+    for (var c = 0; c < size; c++) {
+      if (this.grid[rowIndex][c] !== 0) {
+        cleared.push({ row: rowIndex, col: c });
+        this.grid[rowIndex][c] = 0;
+      }
+    }
+    return cleared;
+  },
+
+  clearCol: function (colIndex) {
+    var size = CONFIG.GRID_SIZE;
+    var cleared = [];
+    if (colIndex < 0 || colIndex >= size) return cleared;
+    for (var r = 0; r < size; r++) {
+      if (this.grid[r][colIndex] !== 0) {
+        cleared.push({ row: r, col: colIndex });
+        this.grid[r][colIndex] = 0;
+      }
+    }
+    return cleared;
+  },
+
+  shuffleCurrentPiece: function () {
+    this.currentShape = getRandomShape();
+    if (!this.canPlaceAnywhere(this.currentShape)) {
+      this.isGameOver = true;
+    }
   },
 
   _findCellsToClear: function () {
@@ -334,16 +471,18 @@ const Game = {
         }
       }
     }
-    // Check columns
-    for (var j = 0; j < size; j++) {
-      var full = true;
-      for (var i = 0; i < size; i++) {
-        if (this.grid[i][j] === 0) { full = false; break; }
-      }
-      if (full) {
-        fullCols++;
+    // Check columns (skip in gravity mode — only horizontal lines)
+    if (!this.isGravity) {
+      for (var j = 0; j < size; j++) {
+        var full = true;
         for (var i = 0; i < size; i++) {
-          cells.push({ row: i, col: j });
+          if (this.grid[i][j] === 0) { full = false; break; }
+        }
+        if (full) {
+          fullCols++;
+          for (var i = 0; i < size; i++) {
+            cells.push({ row: i, col: j });
+          }
         }
       }
     }
@@ -362,7 +501,6 @@ const Game = {
       cells = unique;
     }
 
-    // Store line count for _clearLines
     cells._lineCount = fullRows + fullCols;
     return cells;
   },
@@ -372,7 +510,14 @@ const Game = {
     var totalLines = cells._lineCount || 0;
     if (totalLines === 0) return 0;
     for (var k = 0; k < cells.length; k++) {
-      this.grid[cells[k].row][cells[k].col] = 0;
+      var row = cells[k].row;
+      var col = cells[k].col;
+      // Frozen blocks (value 3) thaw to 1, normal blocks clear to 0
+      if (this.grid[row][col] === 3) {
+        this.grid[row][col] = 1;
+      } else {
+        this.grid[row][col] = 0;
+      }
     }
     return totalLines;
   },
@@ -401,6 +546,8 @@ const Game = {
     this.canUndo = false;
     this._undoState = null;
     this.feverActive = false;
+    this.multiplierBar = 0;
+    this.multiplierActive = false;
     this.linesGoal = Math.min(
       CONFIG.DEFAULT_LINES_GOAL + (this.level - 1) * CONFIG.LINES_GOAL_PER_LEVEL,
       CONFIG.MAX_LINES_GOAL
@@ -410,6 +557,33 @@ const Game = {
     this.nextShape = getRandomShape();
     this.spawnNextShape();
     this._generateStarCells();
+    this._generateFrozenCells();
+  },
+
+  initPuzzle: function (puzzle) {
+    this.init(true, false);
+    this.isPuzzle = true;
+    this.puzzleData = puzzle;
+    this.movesRemaining = puzzle.maxMoves;
+    // Load pre-built grid
+    var size = CONFIG.GRID_SIZE;
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        this.grid[r][c] = puzzle.grid[r] ? (puzzle.grid[r][c] || 0) : 0;
+      }
+    }
+    this.starCells = [];
+  },
+
+  isPuzzleComplete: function () {
+    if (!this.isPuzzle) return false;
+    var size = CONFIG.GRID_SIZE;
+    for (var r = 0; r < size; r++) {
+      for (var c = 0; c < size; c++) {
+        if (this.grid[r][c] !== 0) return false;
+      }
+    }
+    return true;
   },
 
   getCellFromEvent: function (canvas, evt) {
@@ -482,5 +656,26 @@ const Game = {
       }
     }
     return collected;
+  },
+
+  // === Frozen Cells ===
+  _generateFrozenCells: function () {
+    var minLevel = CONFIG.FROZEN_CELLS_MIN_LEVEL || 7;
+    if (this.level < minLevel) return;
+    var count = CONFIG.FROZEN_CELLS_PER_LEVEL || 3;
+    // Scale up slightly with level
+    count = Math.min(count + Math.floor((this.level - minLevel) / 3), 8);
+    var size = CONFIG.GRID_SIZE;
+    var placed = 0;
+    var attempts = 0;
+    while (placed < count && attempts < 100) {
+      attempts++;
+      var r = Math.floor(Math.random() * size);
+      var c = Math.floor(Math.random() * size);
+      if (this.grid[r][c] === 0) {
+        this.grid[r][c] = 3;
+        placed++;
+      }
+    }
   },
 };

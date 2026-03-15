@@ -69,8 +69,8 @@ const ACHIEVEMENTS_LIST = [
     description: 'Сделай 3 комбо подряд',
     condition: function (data) { return (data.bestCombo || 0) >= 3; },
     getProgress: function (data) { return Math.min((data.bestCombo || 0) / 3, 1) * 100; },
-    reward: '50 монет',
-    rewardCoins: 50,
+    reward: '200 монет',
+    rewardCoins: 200,
   },
   {
     id: 'combo_5',
@@ -79,8 +79,8 @@ const ACHIEVEMENTS_LIST = [
     description: 'Сделай 5 комбо подряд',
     condition: function (data) { return (data.bestCombo || 0) >= 5; },
     getProgress: function (data) { return Math.min((data.bestCombo || 0) / 5, 1) * 100; },
-    reward: '100 монет',
-    rewardCoins: 100,
+    reward: '400 монет',
+    rewardCoins: 400,
   },
   {
     id: 'lines_100',
@@ -99,8 +99,8 @@ const ACHIEVEMENTS_LIST = [
     description: 'Набери 10000 очков за одну игру',
     condition: function (data) { return data.bestScoreInOneSession >= 10000; },
     getProgress: function (data) { return Math.min(data.bestScoreInOneSession / 10000, 1) * 100; },
-    reward: '150 монет',
-    rewardCoins: 150,
+    reward: '600 монет',
+    rewardCoins: 600,
   },
   {
     id: 'levels_20',
@@ -119,8 +119,8 @@ const ACHIEVEMENTS_LIST = [
     description: 'Используй 10 бомб',
     condition: function (data) { return (data.totalBombsUsed || 0) >= 10; },
     getProgress: function (data) { return Math.min((data.totalBombsUsed || 0) / 10, 1) * 100; },
-    reward: '75 монет',
-    rewardCoins: 75,
+    reward: '300 монет',
+    rewardCoins: 300,
   },
 ];
 
