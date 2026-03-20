@@ -4,7 +4,7 @@
  */
 var PUZZLES = [
   {
-    id: 'p1', name: 'Первые шаги', maxMoves: 2, reward: 50,
+    id: 'p1', nameKey: 'puzzle_p1', maxMoves: 2, reward: 50,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -19,7 +19,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p2', name: 'Две линии', maxMoves: 3, reward: 75,
+    id: 'p2', nameKey: 'puzzle_p2', maxMoves: 3, reward: 75,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -34,7 +34,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p3', name: 'Уголок', maxMoves: 3, reward: 100,
+    id: 'p3', nameKey: 'puzzle_p3', maxMoves: 3, reward: 100,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -49,7 +49,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p4', name: 'Перекрёсток', maxMoves: 4, reward: 120,
+    id: 'p4', nameKey: 'puzzle_p4', maxMoves: 4, reward: 120,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -64,7 +64,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p5', name: 'Островок', maxMoves: 4, reward: 150,
+    id: 'p5', nameKey: 'puzzle_p5', maxMoves: 4, reward: 150,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -79,7 +79,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p6', name: 'Лестница', maxMoves: 5, reward: 180,
+    id: 'p6', nameKey: 'puzzle_p6', maxMoves: 5, reward: 180,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -94,7 +94,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p7', name: 'Крепость', maxMoves: 5, reward: 200,
+    id: 'p7', nameKey: 'puzzle_p7', maxMoves: 5, reward: 200,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -109,7 +109,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p8', name: 'Зигзаг', maxMoves: 6, reward: 250,
+    id: 'p8', nameKey: 'puzzle_p8', maxMoves: 6, reward: 250,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -124,7 +124,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p9', name: 'Лабиринт', maxMoves: 7, reward: 300,
+    id: 'p9', nameKey: 'puzzle_p9', maxMoves: 7, reward: 300,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -139,7 +139,7 @@ var PUZZLES = [
     ]
   },
   {
-    id: 'p10', name: 'Финал', maxMoves: 8, reward: 500,
+    id: 'p10', nameKey: 'puzzle_p10', maxMoves: 8, reward: 500,
     grid: [
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],

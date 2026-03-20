@@ -50,47 +50,42 @@ const CONFIG = {
 
 /** Темы блоков — id: { cell, glow, name, gridBg, gridLine, accent } */
 const THEMES = {
-  default: { cell: '#ff6b9d', glow: 'rgba(255, 107, 157, 0.6)', name: 'Розовый',
+  default: { cell: '#ff6b9d', glow: 'rgba(255, 107, 157, 0.6)', nameKey: 'theme_default',
              gridBg: '#1a1825', gridLine: 'rgba(255, 107, 157, 0.08)', accent: '#ff6b9d' },
-  wood:    { cell: '#f59e0b', glow: 'rgba(245, 158, 11, 0.6)', name: 'Дерево',
+  wood:    { cell: '#f59e0b', glow: 'rgba(245, 158, 11, 0.6)', nameKey: 'theme_wood',
              gridBg: '#1c1a14', gridLine: 'rgba(245, 158, 11, 0.08)', accent: '#f59e0b' },
-  nature:  { cell: '#4ade80', glow: 'rgba(74, 222, 128, 0.6)', name: 'Природа',
+  nature:  { cell: '#4ade80', glow: 'rgba(74, 222, 128, 0.6)', nameKey: 'theme_nature',
              gridBg: '#141c17', gridLine: 'rgba(74, 222, 128, 0.08)', accent: '#4ade80' },
-  cosmos:  { cell: '#818cf8', glow: 'rgba(129, 140, 248, 0.6)', name: 'Космос',
+  cosmos:  { cell: '#818cf8', glow: 'rgba(129, 140, 248, 0.6)', nameKey: 'theme_cosmos',
              gridBg: '#12111f', gridLine: 'rgba(129, 140, 248, 0.1)', accent: '#818cf8' },
-  fire:    { cell: '#fb923c', glow: 'rgba(251, 146, 60, 0.6)', name: 'Огонь',
+  fire:    { cell: '#fb923c', glow: 'rgba(251, 146, 60, 0.6)', nameKey: 'theme_fire',
              gridBg: '#1c1510', gridLine: 'rgba(251, 146, 60, 0.1)', accent: '#fb923c' },
 };
 
-const ASSETS = {
-  characters: 'assets/characters/',
-  blocks: 'assets/blocks/',
-  ui: 'assets/ui/',
-};
 
 const PIECE_SKINS = [
-  { id: 'default', name: 'Вода', price: 0, file: 'skin_water.png' },
-  { id: 'fire', name: 'Огонь', price: 500, file: 'skin_fire.png' },
-  { id: 'ice', name: 'Лёд', price: 800, file: 'skin_ice.png' },
-  { id: 'forest', name: 'Лес', price: 800, file: 'skin_forest.png' },
-  { id: 'puyo', name: 'Классика Puyo', price: 250, file: 'pieces.png' },
-  { id: 'gem', name: 'Драгоценность', price: 1000, file: 'skin_gem.png', noTint: true },
-  { id: 'candy', name: 'Конфета', price: 650, file: 'skin_candy.png', noTint: true },
-  { id: 'metal', name: 'Металл', price: 1200, file: 'skin_metal.png', noTint: true },
+  { id: 'default', nameKey: 'skin_default', price: 0, file: 'skin_water.png' },
+  { id: 'fire', nameKey: 'skin_fire', price: 500, file: 'skin_fire.png' },
+  { id: 'ice', nameKey: 'skin_ice', price: 800, file: 'skin_ice.png' },
+  { id: 'forest', nameKey: 'skin_forest', price: 800, file: 'skin_forest.png' },
+  { id: 'puyo', nameKey: 'skin_puyo', price: 250, file: 'pieces.png' },
+  { id: 'gem', nameKey: 'skin_gem', price: 1000, file: 'skin_gem.png', noTint: true },
+  { id: 'candy', nameKey: 'skin_candy', price: 650, file: 'skin_candy.png', noTint: true },
+  { id: 'metal', nameKey: 'skin_metal', price: 1200, file: 'skin_metal.png', noTint: true },
 ];
 
 /** Шаблоны ежедневных заданий */
 const DAILY_CHALLENGE_TEMPLATES = [
-  { id: 'clear_3_lines', text: 'Очисти 3 линии за одну игру', target: 3, type: 'lines', reward: 100 },
-  { id: 'clear_5_lines', text: 'Очисти 5 линий за одну игру', target: 5, type: 'lines', reward: 150 },
-  { id: 'use_bomb', text: 'Используй бомбу', target: 1, type: 'bombs', reward: 75 },
-  { id: 'use_2_bombs', text: 'Используй 2 бомбы', target: 2, type: 'bombs', reward: 120 },
-  { id: 'combo_2', text: 'Сделай комбо x2', target: 2, type: 'combo', reward: 100 },
-  { id: 'combo_3', text: 'Сделай комбо x3', target: 3, type: 'combo', reward: 200 },
-  { id: 'score_1000', text: 'Набери 1000 очков за игру', target: 1000, type: 'score', reward: 100 },
-  { id: 'score_3000', text: 'Набери 3000 очков за игру', target: 3000, type: 'score', reward: 200 },
-  { id: 'play_2_games', text: 'Сыграй 2 игры', target: 2, type: 'games', reward: 80 },
-  { id: 'collect_star', text: 'Собери звезду', target: 1, type: 'stars', reward: 75 },
-  { id: 'collect_3_stars', text: 'Собери 3 звезды', target: 3, type: 'stars', reward: 150 },
-  { id: 'clear_level', text: 'Пройди уровень', target: 1, type: 'levels', reward: 120 },
+  { id: 'clear_3_lines', textKey: 'chall_clear_3_lines', target: 3, type: 'lines', reward: 100 },
+  { id: 'clear_5_lines', textKey: 'chall_clear_5_lines', target: 5, type: 'lines', reward: 150 },
+  { id: 'use_bomb', textKey: 'chall_use_bomb', target: 1, type: 'bombs', reward: 75 },
+  { id: 'use_2_bombs', textKey: 'chall_use_2_bombs', target: 2, type: 'bombs', reward: 120 },
+  { id: 'combo_2', textKey: 'chall_combo_2', target: 2, type: 'combo', reward: 100 },
+  { id: 'combo_3', textKey: 'chall_combo_3', target: 3, type: 'combo', reward: 200 },
+  { id: 'score_1000', textKey: 'chall_score_1000', target: 1000, type: 'score', reward: 100 },
+  { id: 'score_3000', textKey: 'chall_score_3000', target: 3000, type: 'score', reward: 200 },
+  { id: 'play_2_games', textKey: 'chall_play_2_games', target: 2, type: 'games', reward: 80 },
+  { id: 'collect_star', textKey: 'chall_collect_star', target: 1, type: 'stars', reward: 75 },
+  { id: 'collect_3_stars', textKey: 'chall_collect_3_stars', target: 3, type: 'stars', reward: 150 },
+  { id: 'clear_level', textKey: 'chall_clear_level', target: 1, type: 'levels', reward: 120 },
 ];

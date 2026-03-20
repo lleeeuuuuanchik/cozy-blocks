@@ -31,10 +31,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 html {
   height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
@@ -52,6 +58,7 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -162,18 +169,22 @@ body {
 
 .menu-content .btn {
   width: 100%;
+}
+
+.menu-btns-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
   margin-top: 10px;
 }
 
-.menu-btns-row {
-  display: flex;
-  gap: 10px;
+.menu-btns-grid .btn {
   width: 100%;
 }
 
-.menu-btns-row .btn {
-  flex: 1;
-  margin-top: 10px;
+.menu-btn-full {
+  grid-column: 1 / -1;
 }
 
 .menu-credits {
@@ -787,13 +798,12 @@ body {
 
 .game-footer {
   margin-top: 12px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
 }
 
-.game-footer .btn { min-width: 90px; }
+.game-footer .btn { width: 100%; }
 
 /* ======= Modal Screens ======= */
 #screen-level-win,

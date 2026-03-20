@@ -73,14 +73,14 @@
       var owned = purchased.indexOf(s.id) !== -1;
       var isEquipped = equipped === s.id;
       var btn = '';
-      if (s.price === 0) btn = '<span class="shop-default">По умолчанию</span>';
-      else if (!owned) btn = '<button class="btn btn-shop-buy" data-skin-id="' + s.id + '" data-price="' + s.price + '">Купить ' + s.price + '</button>';
-      else if (!isEquipped) btn = '<button class="btn btn-shop-equip" data-skin-id="' + s.id + '">Надеть</button>';
-      else btn = '<span class="shop-equipped">Надето</span>';
+      if (s.price === 0) btn = '<span class="shop-default">' + I18N.t('shop_default') + '</span>';
+      else if (!owned) btn = '<button class="btn btn-shop-buy" data-skin-id="' + s.id + '" data-price="' + s.price + '">' + I18N.t('shop_buy') + ' ' + s.price + '</button>';
+      else if (!isEquipped) btn = '<button class="btn btn-shop-equip" data-skin-id="' + s.id + '">' + I18N.t('shop_equip') + '</button>';
+      else btn = '<span class="shop-equipped">' + I18N.t('shop_equipped') + '</span>';
       return (
         '<div class="shop-item' + (isEquipped ? ' shop-item-equipped' : '') + '">' +
-        '<div class="shop-item-preview" data-skin-file="' + (ASSETS.blocks + s.file) + '"></div>' +
-        '<span class="shop-item-name">' + s.name + '</span>' +
+        '<div class="shop-item-preview" data-skin-file="assets/blocks/' + s.file + '"></div>' +
+        '<span class="shop-item-name">' + I18N.t(s.nameKey) + '</span>' +
         '<div class="shop-item-action">' + btn + '</div>' +
         '</div>'
       );
@@ -130,10 +130,10 @@
       progress = Math.min(Math.round(progress), 100);
       return '<div class="achievement-card' + (isUnlocked ? ' achievement-unlocked' : '') + '">' +
         '<div class="achievement-icon">' + (a.icon || '?') + '</div>' +
-        '<div class="achievement-name">' + a.name + '</div>' +
-        '<div class="achievement-desc">' + (a.description || '') + '</div>' +
+        '<div class="achievement-name">' + (a.nameKey ? I18N.t(a.nameKey) : (a.name || '')) + '</div>' +
+        '<div class="achievement-desc">' + (a.descKey ? I18N.t(a.descKey) : (a.description || '')) + '</div>' +
         '<div class="achievement-progress"><div class="achievement-progress-fill" style="width:' + progress + '%"></div></div>' +
-        '<div class="achievement-reward">' + a.reward + '</div>' +
+        '<div class="achievement-reward">' + (a.rewardKey ? I18N.t(a.rewardKey) : (a.reward || '')) + '</div>' +
         '</div>';
     }).join('');
   }
@@ -145,16 +145,16 @@
     Progress.load();
     var challenges = Progress.getDailyChallenges();
     if (!challenges || challenges.length === 0) {
-      list.innerHTML = '<p class="challenges-empty">Нет заданий</p>';
+      list.innerHTML = '<p class="challenges-empty">' + I18N.t('challenges_empty') + '</p>';
       return;
     }
     list.innerHTML = challenges.map(function (ch) {
       var pct = Math.min(100, Math.round((ch.progress / ch.target) * 100));
       var cls = 'challenge-card' + (ch.completed ? ' challenge-completed' : '');
       return '<div class="' + cls + '">' +
-        '<div class="challenge-text">' + ch.text + '</div>' +
+        '<div class="challenge-text">' + (ch.textKey ? I18N.t(ch.textKey) : (ch.text || '')) + '</div>' +
         '<div class="challenge-progress"><div class="challenge-progress-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="challenge-meta"><span>' + ch.progress + '/' + ch.target + '</span><span class="challenge-reward">+' + ch.reward + ' монет</span></div>' +
+        '<div class="challenge-meta"><span>' + ch.progress + '/' + ch.target + '</span><span class="challenge-reward">+' + ch.reward + ' ' + I18N.t('challenge_reward_suffix') + '</span></div>' +
         '</div>';
     }).join('');
   }
@@ -171,7 +171,7 @@
       var ch = completed[i];
       if (typeof Juice !== 'undefined') {
         var wrap = document.getElementById('game-canvas-wrap');
-        if (wrap) Juice.floatText('Задание: +' + ch.reward, wrap.offsetWidth / 2 - 40, 20, wrap, '#4ade80');
+        if (wrap) Juice.floatText(I18N.t('challenge_task', { n: ch.reward }), wrap.offsetWidth / 2 - 40, 20, wrap, '#4ade80');
       }
     }
   }
@@ -183,15 +183,15 @@
     Progress.load();
     var scores = Progress.getWeeklyScores();
     if (!scores || scores.length === 0) {
-      list.innerHTML = '<p class="leaderboard-empty">Пока нет результатов на этой неделе</p>';
+      list.innerHTML = '<p class="leaderboard-empty">' + I18N.t('leaderboard_empty') + '</p>';
       return;
     }
 
     function modeText(mode) {
-      if (mode === 'gravity') return 'Грав.';
-      if (mode === 'endless') return 'Беск.';
-      if (mode === 'timeattack') return 'Таймер';
-      return 'Уровни';
+      if (mode === 'gravity') return I18N.t('lb_gravity');
+      if (mode === 'endless') return I18N.t('lb_endless');
+      if (mode === 'timeattack') return I18N.t('lb_timer');
+      return I18N.t('lb_levels');
     }
 
     var medals = ['🥇', '🥈', '🥉'];
@@ -261,10 +261,10 @@
       if (isUnlocked) cls += ' theme-unlocked';
       else cls += ' theme-locked';
       if (isSelected) cls += ' theme-selected';
-      var status = isSelected ? 'Выбрана' : (isUnlocked ? 'Доступна' : 'Заблокирована');
+      var status = isSelected ? I18N.t('theme_selected') : (isUnlocked ? I18N.t('theme_available') : I18N.t('theme_locked'));
       html += '<div class="' + cls + '" data-theme-id="' + id + '">' +
         '<div class="theme-swatch" style="background:' + theme.cell + ';box-shadow:0 0 16px ' + theme.glow + '"></div>' +
-        '<span class="theme-card-name">' + (theme.name || id) + '</span>' +
+        '<span class="theme-card-name">' + (theme.nameKey ? I18N.t(theme.nameKey) : id) + '</span>' +
         '<span class="theme-card-status">' + status + '</span>' +
         '</div>';
     }
@@ -285,25 +285,25 @@
 
   // ==================== Lucky Spin ====================
   var SPIN_PRIZES = [
-    { icon: '↩', text: '+1 отмена', apply: function () { Game.undosRemaining += 1; } },
-    { icon: '↩↩', text: '+2 отмены', apply: function () { Game.undosRemaining += 2; } },
-    { icon: '💣', text: 'Бомба! Следующая фигура — бомба', apply: function () {
+    { icon: '↩', textKey: 'spin_undo_1', apply: function () { Game.undosRemaining += 1; } },
+    { icon: '↩↩', textKey: 'spin_undo_2', apply: function () { Game.undosRemaining += 2; } },
+    { icon: '💣', textKey: 'spin_bomb', apply: function () {
       var bomb = BOMB_SHAPE.map(function (r) { return [].concat(r); });
       bomb.isBomb = true;
       Game.currentShape = bomb;
     }},
-    { icon: '⭐', text: '+3 звезды на поле', apply: function () {
+    { icon: '⭐', textKey: 'spin_stars', apply: function () {
       for (var n = 0; n < 3; n++) {
         var r = Math.floor(Math.random() * CONFIG.GRID_SIZE);
         var c = Math.floor(Math.random() * CONFIG.GRID_SIZE);
         Game.starCells.push({ row: r, col: c });
       }
     }},
-    { icon: '💰', text: '+100 монет', apply: function () {
+    { icon: '💰', textKey: 'spin_coins', apply: function () {
       Progress.data.coins = (Progress.data.coins || 0) + 100;
       Progress.save();
     }},
-    { icon: '🔥', text: 'Fever Mode активирован!', apply: function () {
+    { icon: '🔥', textKey: 'spin_fever', apply: function () {
       Game.feverActive = true;
       startFever();
     }},
@@ -324,7 +324,7 @@
     var textEl = document.getElementById('spin-result-text');
     if (resultEl && iconEl && textEl) {
       iconEl.textContent = prize.icon;
-      textEl.textContent = prize.text;
+      textEl.textContent = I18N.t(prize.textKey);
       resultEl.classList.remove('hidden');
       if (typeof gsap !== 'undefined') {
         gsap.fromTo(resultEl.querySelector('.spin-result-card'),
@@ -355,6 +355,7 @@
     _powerupSelectMode = null;
     hidePowerupShop();
     showScreen('screen-game');
+    if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStart();
     if (typeof Dialogue !== 'undefined') Dialogue.showMessage('onStart');
   }
 
@@ -399,6 +400,7 @@
       }
     }, 1000);
 
+    if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStart();
     if (typeof Dialogue !== 'undefined') Dialogue.showMessage('onStart');
   }
 
@@ -443,14 +445,15 @@
       var unlocksEl = document.getElementById('win-unlocks');
       if (unlocksEl && newlyUnlocked.length > 0) {
         unlocksEl.style.display = 'block';
-        unlocksEl.innerHTML = '<p>Разблокировано:</p><ul>' +
-          newlyUnlocked.map(function (a) { return '<li>' + a.reward + '</li>'; }).join('') + '</ul>';
+        unlocksEl.innerHTML = '<p>' + I18N.t('unlocked') + '</p><ul>' +
+          newlyUnlocked.map(function (a) { return '<li>' + (a.rewardKey ? I18N.t(a.rewardKey) : (a.reward || '')) + '</li>'; }).join('') + '</ul>';
       } else if (unlocksEl) {
         unlocksEl.style.display = 'none';
         unlocksEl.innerHTML = '';
       }
       stopFever();
       stopTimeAttack();
+      if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStop();
       showScreen('screen-level-win');
       if (typeof YandexSDK !== 'undefined') YandexSDK.showInterstitial();
       if (typeof Dialogue !== 'undefined') {
@@ -487,6 +490,7 @@
       document.getElementById('gameover-score').textContent = Game.score;
       stopFever();
       stopTimeAttack();
+      if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStop();
       showScreen('screen-gameover');
       if (typeof Dialogue !== 'undefined') Dialogue.showMessage('onGameOver');
       return true;
@@ -605,7 +609,7 @@
     if (result.cascadeCount && result.cascadeCount > 0) {
       var wrap = document.getElementById('game-canvas-wrap');
       if (wrap && typeof Juice !== 'undefined') {
-        Juice.floatText('x' + (result.cascadeCount + 1) + ' КАСКАД!', wrap.offsetWidth / 2 - 40, wrap.offsetHeight / 3, wrap, '#fbbf24');
+        Juice.floatText('x' + (result.cascadeCount + 1) + ' ' + I18N.t('cascade'), wrap.offsetWidth / 2 - 40, wrap.offsetHeight / 3, wrap, '#fbbf24');
         Juice.shake(wrap, 5, 0.4);
       }
     }
@@ -636,20 +640,22 @@
       if (unlocksEl) {
         if (!alreadyDone) {
           unlocksEl.style.display = 'block';
-          unlocksEl.innerHTML = '<p>Головоломка решена! +' + pz.reward + ' монет</p>';
+          unlocksEl.innerHTML = '<p>' + I18N.t('puzzle_solved_reward', { n: pz.reward }) + '</p>';
         } else {
           unlocksEl.style.display = 'block';
-          unlocksEl.innerHTML = '<p>Головоломка решена!</p>';
+          unlocksEl.innerHTML = '<p>' + I18N.t('puzzle_solved') + '</p>';
         }
       }
       updateMenuProgress();
+      if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStop();
       showScreen('screen-level-win');
       return;
     }
 
     // Puzzle game over: show special message
     if (Game.isPuzzle && Game.isGameOver) {
-      var msg = Game.movesRemaining <= 0 ? 'Ходы кончились!' : 'Нет места для фигуры!';
+      if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStop();
+      var msg = Game.movesRemaining <= 0 ? I18N.t('puzzle_no_moves') : I18N.t('puzzle_no_space');
       document.getElementById('gameover-score').textContent = msg;
       showScreen('screen-gameover');
       return;
@@ -677,7 +683,7 @@
     if (!Progress.data || (Progress.data.coins || 0) < price) {
       var wrap = document.getElementById('game-canvas-wrap');
       if (wrap && typeof Juice !== 'undefined') {
-        Juice.floatText('Мало монет!', wrap.offsetWidth / 2 - 40, wrap.offsetHeight / 2, wrap, '#f87171');
+        Juice.floatText(I18N.t('not_enough_coins'), wrap.offsetWidth / 2 - 40, wrap.offsetHeight / 2, wrap, '#f87171');
       }
       return;
     }
@@ -876,21 +882,22 @@
     btnGameMenu.addEventListener('click', function () {
       if (!_menuConfirm) {
         _menuConfirm = true;
-        btnGameMenu.textContent = 'Точно?';
+        btnGameMenu.textContent = I18N.t('btn_confirm');
         btnGameMenu.classList.add('btn-confirm');
         _menuTimer = setTimeout(function () {
           _menuConfirm = false;
-          btnGameMenu.textContent = 'Меню';
+          btnGameMenu.textContent = I18N.t('btn_exit_menu');
           btnGameMenu.classList.remove('btn-confirm');
         }, 2000);
         return;
       }
       _menuConfirm = false;
       if (_menuTimer) clearTimeout(_menuTimer);
-      btnGameMenu.textContent = 'Меню';
+      btnGameMenu.textContent = I18N.t('btn_exit_menu');
       btnGameMenu.classList.remove('btn-confirm');
       stopFever();
       stopTimeAttack();
+      if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStop();
       showScreen('screen-menu');
     });
   }
@@ -903,18 +910,18 @@
     btnRestart.addEventListener('click', function () {
       if (!_restartConfirm) {
         _restartConfirm = true;
-        btnRestart.textContent = 'Точно?';
+        btnRestart.textContent = I18N.t('btn_confirm');
         btnRestart.classList.add('btn-confirm');
         _restartTimer = setTimeout(function () {
           _restartConfirm = false;
-          btnRestart.textContent = 'Заново';
+          btnRestart.textContent = I18N.t('btn_restart');
           btnRestart.classList.remove('btn-confirm');
         }, 2000);
         return;
       }
       _restartConfirm = false;
       if (_restartTimer) clearTimeout(_restartTimer);
-      btnRestart.textContent = 'Заново';
+      btnRestart.textContent = I18N.t('btn_restart');
       btnRestart.classList.remove('btn-confirm');
       var wasEndless = Game.isEndless;
       var wasGravity = Game.isGravity;
@@ -1024,9 +1031,9 @@
       var done = Progress.isPuzzleCompleted(p.id);
       return '<div class="puzzle-card' + (done ? ' completed' : '') + '" data-puzzle-id="' + p.id + '">' +
         '<div class="puzzle-num">' + (done ? '✓' : '#' + p.id.replace('p', '')) + '</div>' +
-        '<div class="puzzle-name">' + p.name + '</div>' +
-        '<div class="puzzle-moves">Ходов: ' + p.maxMoves + '</div>' +
-        '<div class="puzzle-reward">' + (done ? 'Пройдено' : '+' + p.reward + ' монет') + '</div>' +
+        '<div class="puzzle-name">' + (p.nameKey ? I18N.t(p.nameKey) : (p.name || '')) + '</div>' +
+        '<div class="puzzle-moves">' + I18N.t('puzzle_moves') + ' ' + p.maxMoves + '</div>' +
+        '<div class="puzzle-reward">' + (done ? I18N.t('puzzle_completed') : '+' + p.reward + ' ' + I18N.t('puzzle_reward')) + '</div>' +
         '</div>';
     }).join('');
     list.querySelectorAll('.puzzle-card').forEach(function (card) {
@@ -1049,6 +1056,7 @@
     _powerupSelectMode = null;
     hidePowerupShop();
     showScreen('screen-game');
+    if (typeof YandexSDK !== 'undefined') YandexSDK.gameplayStart();
     Render.drawAll();
     Render.drawCurrentShape();
     Render.drawNextShapes();
@@ -1057,7 +1065,7 @@
     updatePuzzleMoves();
     // Hide level/goal, show puzzle info
     var goalEl = document.getElementById('goal-text');
-    if (goalEl) goalEl.textContent = 'Головоломка: ' + puzzle.name;
+    if (goalEl) goalEl.textContent = I18N.t('puzzle_prefix') + ' ' + (puzzle.nameKey ? I18N.t(puzzle.nameKey) : (puzzle.name || ''));
   }
 
   // Streak calendar close
@@ -1080,12 +1088,12 @@
       var isCurrent = dayNum === streakInfo.streak;
       var cls = isCurrent ? 'streak-day current' : (isFilled ? 'streak-day filled' : 'streak-day');
       html += '<div class="' + cls + '">' +
-        '<span class="day-num">День ' + dayNum + '</span>' +
+        '<span class="day-num">' + I18N.t('streak_day') + ' ' + dayNum + '</span>' +
         '<span class="day-coins">' + rewards[i] + '</span>' +
         '</div>';
     }
     cal.innerHTML = html;
-    if (rewardEl) rewardEl.textContent = '+' + streakInfo.reward + ' монет';
+    if (rewardEl) rewardEl.textContent = '+' + streakInfo.reward + ' ' + I18N.t('daily_bonus_coins');
     popup.classList.remove('hidden');
     if (typeof gsap !== 'undefined') {
       gsap.fromTo(popup.querySelector('.streak-content'),
@@ -1182,20 +1190,103 @@
     });
   });
 
-  // Cancel power-up selection on Escape
+  // Escape: cancel power-up / go to menu
   document.addEventListener('keydown', function (evt) {
     if (evt.key === 'Escape') {
       if (_powerupSelectMode) {
         _powerupSelectMode = null;
         Render.clearPlacePreview();
+        return;
       }
-      hidePowerupShop();
+      var shop = document.getElementById('powerup-shop');
+      if (shop && !shop.classList.contains('hidden')) {
+        hidePowerupShop();
+        return;
+      }
+      if (_currentScreenId === 'screen-game') {
+        if (btnGameMenu) btnGameMenu.click();
+        return;
+      }
     }
   });
+
+  // Запрет контекстного меню на всей странице
+  document.addEventListener('contextmenu', function (evt) { evt.preventDefault(); });
 
   // Drag-drop
   function onPlaceSuccess(result) {
     handlePlaceResult(result);
+  }
+
+  // ==================== Pause / Resume (п. 1.19.4, 4.7) ====================
+  var _pausedTimeAttackRemaining = 0;
+  var _pausedFeverRemaining = 0;
+  var _isPaused = false;
+
+  function pauseGame() {
+    if (_isPaused) return;
+    _isPaused = true;
+    // Пауза time attack таймера
+    if (_timeAttackInterval) {
+      clearInterval(_timeAttackInterval);
+      _timeAttackInterval = null;
+      _pausedTimeAttackRemaining = _timeAttackRemaining;
+    }
+    // Пауза fever таймера
+    if (_feverTimer && Game.feverActive) {
+      var elapsed = Date.now() - _feverStartTime;
+      _pausedFeverRemaining = Math.max(0, CONFIG.FEVER_DURATION - elapsed);
+      clearTimeout(_feverTimer);
+      _feverTimer = null;
+      if (_feverAnimFrame) { cancelAnimationFrame(_feverAnimFrame); _feverAnimFrame = null; }
+    }
+  }
+
+  function resumeGame() {
+    if (!_isPaused) return;
+    _isPaused = false;
+    // Возобновление time attack
+    if (_pausedTimeAttackRemaining > 0 && Game.isTimeAttack && !Game.isGameOver) {
+      _timeAttackRemaining = _pausedTimeAttackRemaining;
+      _pausedTimeAttackRemaining = 0;
+      var taTimer = document.getElementById('time-attack-timer');
+      _timeAttackInterval = setInterval(function () {
+        _timeAttackRemaining--;
+        if (taTimer) {
+          taTimer.textContent = _timeAttackRemaining;
+          if (_timeAttackRemaining <= 10) {
+            taTimer.classList.add('time-danger');
+            if (typeof Juice !== 'undefined') Juice.pulseElement(taTimer);
+          }
+        }
+        if (_timeAttackRemaining <= 0) {
+          stopTimeAttack();
+          Game.isGameOver = true;
+          checkGameOver();
+        }
+      }, 1000);
+    }
+    // Возобновление fever
+    if (_pausedFeverRemaining > 0 && Game.feverActive) {
+      var feverLeft = _pausedFeverRemaining;
+      _feverStartTime = Date.now() - (CONFIG.FEVER_DURATION - feverLeft);
+      _pausedFeverRemaining = 0;
+      _feverTimer = setTimeout(function () {
+        Game.endFever();
+        stopFever();
+      }, feverLeft);
+      var feverFill = document.getElementById('fever-bar-fill');
+      function animateFeverBar() {
+        var elapsed = Date.now() - _feverStartTime;
+        var remaining = Math.max(0, 1 - elapsed / CONFIG.FEVER_DURATION);
+        if (feverFill) feverFill.style.width = (remaining * 100) + '%';
+        if (remaining > 0 && Game.feverActive) {
+          _feverAnimFrame = requestAnimationFrame(animateFeverBar);
+        }
+      }
+      if (_feverAnimFrame) cancelAnimationFrame(_feverAnimFrame);
+      animateFeverBar();
+    }
   }
 
   // ==================== Init ====================
@@ -1205,7 +1296,10 @@
     Game.init(false);
     if (typeof YandexSDK !== 'undefined') {
       YandexSDK.init(function () {});
+      YandexSDK.onPauseResume(pauseGame, resumeGame);
     }
+    // Начальная локализация DOM (до SDK, используется язык по умолчанию или уже определённый)
+    if (typeof I18N !== 'undefined') I18N.applyToDOM();
     Render.init();
     Render.drawAll();
     Render.updateUI();

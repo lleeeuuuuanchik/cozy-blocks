@@ -81,7 +81,7 @@ var Render = {
       if (skins[i].id === skinId) { skin = skins[i]; break; }
     }
     if (!skin) skin = skins[0];
-    var path = (typeof ASSETS !== 'undefined' && ASSETS.blocks) ? ASSETS.blocks + skin.file : 'assets/blocks/pieces.png';
+    var path = 'assets/blocks/' + skin.file;
     var img = new Image();
     var self = this;
     img.onload = function () {
@@ -616,9 +616,9 @@ var Render = {
     if (scoreEl) scoreEl.textContent = Game.score;
     if (goalEl) {
       if (Game.isEndless) {
-        goalEl.textContent = 'Бесконечный режим — набери максимум очков!';
+        goalEl.textContent = I18N.t('goal_endless');
       } else {
-        goalEl.textContent = 'Цель: очисти ' + Game.linesGoal + ' линий (' + Game.linesClearedThisLevel + '/' + Game.linesGoal + ')';
+        goalEl.textContent = I18N.t('goal_clear', { n: Game.linesGoal, done: Game.linesClearedThisLevel });
       }
     }
     if (coinsEl && typeof Progress !== 'undefined' && Progress.data) coinsEl.textContent = Progress.data.coins != null ? Progress.data.coins : 0;
@@ -671,7 +671,7 @@ var Render = {
       multFill.style.width = pct + '%';
       if (Game.multiplierActive) {
         multBar.classList.add('multiplier-ready');
-        if (multLabel) multLabel.textContent = 'x2 ГОТОВ!';
+        if (multLabel) multLabel.textContent = I18N.t('multiplier_ready');
       } else {
         multBar.classList.remove('multiplier-ready');
         if (multLabel) multLabel.textContent = Game.multiplierBar + '/' + max;

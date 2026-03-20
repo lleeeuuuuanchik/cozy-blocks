@@ -228,7 +228,7 @@ const Progress = {
     var picked = shuffled.slice(0, 3);
     var challenges = [];
     for (var i = 0; i < picked.length; i++) {
-      challenges.push({ id: picked[i].id, text: picked[i].text, target: picked[i].target, type: picked[i].type, reward: picked[i].reward, progress: 0, completed: false });
+      challenges.push({ id: picked[i].id, textKey: picked[i].textKey, target: picked[i].target, type: picked[i].type, reward: picked[i].reward, progress: 0, completed: false });
     }
     this.data.dailyChallenges = challenges;
     this.data.dailyChallengesDate = today;

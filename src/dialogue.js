@@ -4,58 +4,58 @@
  */
 const DIALOGUE_LINES = {
   onStart: [
-    { characterId: '1', text: 'Давай соберём линии вместе!' },
-    { characterId: '1', text: 'Ставь фигуры и заполняй строки и столбцы.' },
-    { characterId: '1', text: 'Я буду подсказывать — ты собирай блоки!' },
+    { characterId: '1', textKey: 'dlg_start_0' },
+    { characterId: '1', textKey: 'dlg_start_1' },
+    { characterId: '1', textKey: 'dlg_start_2' },
   ],
   onLevelWin: [
-    { characterId: '1', text: 'Супер! Так держать!' },
-    { characterId: '1', text: 'Отлично справилась!' },
-    { characterId: '1', text: 'Ещё один уровень — красота!' },
-    { characterId: '2', text: 'Молодец! Продолжай в том же духе!' },
-    { characterId: '3', text: 'Победа! Ты настоящий мастер блоков.' },
+    { characterId: '1', textKey: 'dlg_win_0' },
+    { characterId: '1', textKey: 'dlg_win_1' },
+    { characterId: '1', textKey: 'dlg_win_2' },
+    { characterId: '2', textKey: 'dlg_win_3' },
+    { characterId: '3', textKey: 'dlg_win_4' },
   ],
   onGameOver: [
-    { characterId: '1', text: 'Бывает! Попробуй ещё раз — получится.' },
-    { characterId: '1', text: 'Не сдавайся! Каждая попытка считается.' },
-    { characterId: '2', text: 'В следующий раз повезёт. Давай заново!' },
-    { characterId: '3', text: 'Отдохни и возвращайся — я в тебя верю!' },
+    { characterId: '1', textKey: 'dlg_over_0' },
+    { characterId: '1', textKey: 'dlg_over_1' },
+    { characterId: '2', textKey: 'dlg_over_2' },
+    { characterId: '3', textKey: 'dlg_over_3' },
   ],
   onCombo: [
-    { characterId: '1', text: 'Несколько линий сразу — вот это да!' },
-    { characterId: '1', text: 'Комбо! Ты огонь!' },
-    { characterId: '2', text: 'Сразу столько линий — круто!' },
-    { characterId: '3', text: 'Комбо-мастер! Продолжай!' },
+    { characterId: '1', textKey: 'dlg_combo_0' },
+    { characterId: '1', textKey: 'dlg_combo_1' },
+    { characterId: '2', textKey: 'dlg_combo_2' },
+    { characterId: '3', textKey: 'dlg_combo_3' },
   ],
   onAchievement: [
-    { characterId: '1', text: 'Ты разблокировала что-то новое! Поздравляю!' },
-    { characterId: '1', text: 'Достижение получено! Так держать!' },
-    { characterId: '2', text: 'Награда твоя — ты её заслужила!' },
-    { characterId: '3', text: 'Ещё один шаг вперёд. Горжусь тобой!' },
+    { characterId: '1', textKey: 'dlg_ach_0' },
+    { characterId: '1', textKey: 'dlg_ach_1' },
+    { characterId: '2', textKey: 'dlg_ach_2' },
+    { characterId: '3', textKey: 'dlg_ach_3' },
   ],
   onLevelMilestone: [
-    { characterId: '1', text: 'Уровень {level} — уже серьёзно! Ты справляешься.' },
-    { characterId: '1', text: 'Отличный прогресс! Дальше — больше.' },
-    { characterId: '2', text: 'Мы с тобой уже далеко зашли. Вперёд!' },
-    { characterId: '3', text: 'Уровень {level} покорён. Что дальше?' },
+    { characterId: '1', textKey: 'dlg_milestone_0' },
+    { characterId: '1', textKey: 'dlg_milestone_1' },
+    { characterId: '2', textKey: 'dlg_milestone_2' },
+    { characterId: '3', textKey: 'dlg_milestone_3' },
   ],
   onFever: [
-    { characterId: '1', text: 'FEVER MODE! Очки утроены!' },
-    { characterId: '2', text: 'Огонь! Все очки x3!' },
-    { characterId: '3', text: 'Режим огня активирован!' },
+    { characterId: '1', textKey: 'dlg_fever_0' },
+    { characterId: '2', textKey: 'dlg_fever_1' },
+    { characterId: '3', textKey: 'dlg_fever_2' },
   ],
   onStar: [
-    { characterId: '1', text: 'Звезда собрана! +{coins} монет!' },
-    { characterId: '2', text: 'Блестяще! Звезда — твоя!' },
+    { characterId: '1', textKey: 'dlg_star_0' },
+    { characterId: '2', textKey: 'dlg_star_1' },
   ],
 };
 
 const DIALOGUE_CHARACTERS = (function () {
-  var base = typeof ASSETS !== 'undefined' && ASSETS.characters ? ASSETS.characters : 'assets/characters/';
+  var base = 'assets/characters/';
   return [
-    { id: '1', name: 'Подруга', baseFolder: base + '1/', color: 'pink' },
-    { id: '2', name: 'Нацуми', baseFolder: base + '2/', unlockAchievementId: 'total_lines_50', color: 'purple' },
-    { id: '3', name: 'Михо', baseFolder: base + '3/', unlockAchievementId: 'total_levels_10', color: 'cyan' },
+    { id: '1', nameKey: 'char_1', baseFolder: base + '1/', color: 'pink' },
+    { id: '2', nameKey: 'char_2', baseFolder: base + '2/', unlockAchievementId: 'total_lines_50', color: 'purple' },
+    { id: '3', nameKey: 'char_3', baseFolder: base + '3/', unlockAchievementId: 'total_levels_10', color: 'cyan' },
   ];
 })();
 
@@ -107,10 +107,12 @@ const Dialogue = {
     var mood = TRIGGER_TO_AVATAR[trigger] || 'default';
     var avatarUrl = character && character.baseFolder ? character.baseFolder + mood + '.png' : '';
 
-    var text = (line && line.text) || '';
-    text = text.replace(/\{level\}/g, payload.level !== undefined ? payload.level : '');
-    text = text.replace(/\{reward\}/g, payload.reward !== undefined ? payload.reward : '');
-    text = text.replace(/\{coins\}/g, payload.coins !== undefined ? payload.coins : '');
+    var text = '';
+    if (line && line.textKey && typeof I18N !== 'undefined') {
+      text = I18N.t(line.textKey, payload);
+    } else if (line && line.textKey) {
+      text = line.textKey;
+    }
 
     if (!this.container || !this.textEl) {
       if (!this.container && document.getElementById('character-message')) this.init();
@@ -123,12 +125,12 @@ const Dialogue = {
 
     // Name badge
     if (this.nameBadge) {
-      this.nameBadge.textContent = character ? character.name : '';
+      this.nameBadge.textContent = character ? (typeof I18N !== 'undefined' ? I18N.t(character.nameKey) : character.nameKey) : '';
     }
 
     // Avatar
     if (this.avatarEl) {
-      this.avatarEl.alt = character ? character.name : '';
+      this.avatarEl.alt = character ? (typeof I18N !== 'undefined' ? I18N.t(character.nameKey) : character.nameKey) : '';
       this.avatarEl.src = avatarUrl;
       this.avatarEl.onerror = function () {
         this.style.display = 'none';

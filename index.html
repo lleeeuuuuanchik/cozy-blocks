@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -40,11 +40,11 @@
   <!-- Streak Calendar Popup -->
   <div id="streak-popup" class="streak-popup hidden">
     <div class="streak-content">
-      <h2>Ежедневный бонус</h2>
-      <p class="streak-subtitle">Заходи каждый день — бонус растёт!</p>
+      <h2 data-i18n="streak_title">Ежедневный бонус</h2>
+      <p class="streak-subtitle" data-i18n="streak_subtitle">Заходи каждый день — бонус растёт!</p>
       <div id="streak-calendar" class="streak-calendar"></div>
       <div id="streak-reward" class="streak-reward"></div>
-      <button id="btn-streak-close" class="btn btn-primary">Забрать</button>
+      <button id="btn-streak-close" class="btn btn-primary" data-i18n="streak_collect">Забрать</button>
     </div>
   </div>
 
@@ -52,46 +52,28 @@
     <!-- Меню -->
     <div id="screen-menu" class="screen active">
       <div class="menu-content">
-        <h1 class="game-title">Уютные блоки</h1>
-        <p class="game-subtitle">Собирай линии и проходи уровни</p>
+        <h1 class="game-title" data-i18n="title">Уютные блоки</h1>
+        <p class="game-subtitle" data-i18n="subtitle">Собирай линии и проходи уровни</p>
         <div id="menu-progress" class="menu-progress">
-          <p>Монеты: <span id="stat-coins">0</span></p>
-          <p>Всего уровней: <span id="stat-levels">0</span></p>
-          <p>Рекорд уровня: <span id="stat-max-level">1</span></p>
-          <p>Всего линий: <span id="stat-lines">0</span></p>
-          <p>Рекорд (бесконечный): <span id="stat-endless">0</span></p>
-          <p>Рекорд (таймер): <span id="stat-timeattack">0</span></p>
+          <p><span data-i18n="stat_coins">Монеты:</span> <span id="stat-coins">0</span></p>
+          <p><span data-i18n="stat_levels">Всего уровней:</span> <span id="stat-levels">0</span></p>
+          <p><span data-i18n="stat_max_level">Рекорд уровня:</span> <span id="stat-max-level">1</span></p>
+          <p><span data-i18n="stat_lines">Всего линий:</span> <span id="stat-lines">0</span></p>
+          <p><span data-i18n="stat_endless">Рекорд (бесконечный):</span> <span id="stat-endless">0</span></p>
+          <p><span data-i18n="stat_timeattack">Рекорд (таймер):</span> <span id="stat-timeattack">0</span></p>
         </div>
-        <button id="btn-play" class="btn btn-primary">Играть</button>
-        <div class="menu-btns-row">
-          <button id="btn-endless" class="btn btn-secondary">Бесконечный</button>
-          <button id="btn-gravity" class="btn btn-secondary">Гравитация</button>
-        </div>
-        <div class="menu-btns-row">
-          <button id="btn-time-attack" class="btn btn-secondary">Таймер</button>
-          <button id="btn-puzzles" class="btn btn-secondary">Головоломки</button>
-        </div>
-        <div class="menu-btns-row">
-          <button id="btn-shop" class="btn btn-secondary">Магазин</button>
-          <button id="btn-themes" class="btn btn-secondary">Темы</button>
-        </div>
-        <div class="menu-btns-row">
-          <button id="btn-achievements" class="btn btn-secondary">Достижения</button>
-          <button id="btn-challenges" class="btn btn-secondary">Задания</button>
-        </div>
-        <div class="menu-btns-row">
-          <button id="btn-leaderboard" class="btn btn-secondary">Рейтинг</button>
-          <button id="btn-instructions" class="btn btn-secondary">Как играть</button>
-        </div>
-        <div class="menu-credits">
-          <p>Использованы ассеты:</p>
-          <ul>
-            <li><a href="https://opengameart.org/content/puzzle-game-blocks" target="_blank" rel="noopener">Puzzle Game Blocks (OGA, CC0)</a></li>
-            <li><a href="https://opengameart.org/content/match-3-game-blocks-tiles" target="_blank" rel="noopener">Match 3 Game Blocks Tiles — limbusdev/Georg Eckert (OGA, GPL 3.0)</a></li>
-            <li><a href="https://potat0master.itch.io/free-character-sprite-for-visual-novels" target="_blank" rel="noopener">Keiko (Potat0Master)</a></li>
-            <li><a href="https://noranekogames.itch.io/natsumi" target="_blank" rel="noopener">Natsumi — Noraneko Games</a></li>
-            <li><a href="https://noranekogames.itch.io/miho" target="_blank" rel="noopener">Miho — Noraneko Games</a></li>
-          </ul>
+        <div class="menu-btns-grid">
+          <button id="btn-play" class="btn btn-primary menu-btn-full" data-i18n="btn_play">Играть</button>
+          <button id="btn-endless" class="btn btn-secondary" data-i18n="btn_endless">Бесконечный</button>
+          <button id="btn-gravity" class="btn btn-secondary" data-i18n="btn_gravity">Гравитация</button>
+          <button id="btn-time-attack" class="btn btn-secondary" data-i18n="btn_timer">Таймер</button>
+          <button id="btn-puzzles" class="btn btn-secondary" data-i18n="btn_puzzles">Головоломки</button>
+          <button id="btn-shop" class="btn btn-secondary" data-i18n="btn_shop">Магазин</button>
+          <button id="btn-themes" class="btn btn-secondary" data-i18n="btn_themes">Темы</button>
+          <button id="btn-achievements" class="btn btn-secondary" data-i18n="btn_achievements">Достижения</button>
+          <button id="btn-challenges" class="btn btn-secondary" data-i18n="btn_challenges">Задания</button>
+          <button id="btn-leaderboard" class="btn btn-secondary" data-i18n="btn_leaderboard">Рейтинг</button>
+          <button id="btn-instructions" class="btn btn-secondary" data-i18n="btn_howto">Как играть</button>
         </div>
       </div>
     </div>
@@ -102,16 +84,16 @@
       <div class="game-sidebar game-sidebar-left">
         <div class="game-header">
           <div class="header-row">
-            <span>Уровень <span id="level-num">1</span></span>
-            <span>Очки: <span id="score">0</span></span>
+            <span><span data-i18n="level">Уровень</span> <span id="level-num">1</span></span>
+            <span><span data-i18n="score">Очки:</span> <span id="score">0</span></span>
           </div>
           <div class="header-row">
-            <span>Монеты: <span id="game-coins">0</span></span>
+            <span><span data-i18n="coins">Монеты:</span> <span id="game-coins">0</span></span>
           </div>
           <div class="header-row goal-row">
             <span id="goal-text">Цель: очисти 5 линий</span>
-            <span id="puzzle-moves" class="moves-counter" style="display:none">Ходы: <span id="puzzle-moves-num">0</span></span>
-            <span id="combo-counter" class="combo-counter" style="display:none">Комбо x<span id="combo-num">1</span></span>
+            <span id="puzzle-moves" class="moves-counter" style="display:none"><span data-i18n="moves_label">Ходы:</span> <span id="puzzle-moves-num">0</span></span>
+            <span id="combo-counter" class="combo-counter" style="display:none"><span data-i18n="combo_label">Комбо x</span><span id="combo-num">1</span></span>
           </div>
           <!-- Time Attack timer -->
           <div id="time-attack-wrap" class="time-attack-wrap" style="display:none">
@@ -120,7 +102,7 @@
           </div>
           <!-- Grid fill meter -->
           <div class="grid-fill-bar">
-            <span class="grid-fill-label">Поле: <span id="grid-fill-percent">0%</span></span>
+            <span class="grid-fill-label"><span data-i18n="grid_fill">Поле:</span> <span id="grid-fill-percent">0%</span></span>
             <div class="grid-fill-track"><div id="grid-fill-bar-fill" class="grid-fill-fill"></div></div>
           </div>
           <!-- Multiplier bar -->
@@ -130,7 +112,7 @@
           </div>
           <!-- Fever bar -->
           <div id="fever-bar" class="fever-bar" style="display:none">
-            <div class="fever-bar-label">FEVER x3</div>
+            <div class="fever-bar-label" data-i18n="fever_label">FEVER x3</div>
             <div class="fever-bar-track"><div id="fever-bar-fill" class="fever-bar-fill"></div></div>
           </div>
         </div>
@@ -144,10 +126,10 @@
           <canvas id="particle-canvas" class="particle-canvas" width="300" height="300"></canvas>
         </div>
         <div class="game-footer">
-          <button id="btn-powerups" class="btn btn-icon" title="Способности">⚡</button>
-          <button id="btn-lucky-spin" class="btn btn-lucky-spin" title="Крутить рулетку">🎰 (<span id="spin-cost">200</span>)</button>
-          <button id="btn-game-menu" class="btn btn-secondary">Меню</button>
-          <button id="btn-restart" class="btn btn-secondary">Заново</button>
+          <button id="btn-powerups" class="btn btn-icon" data-i18n-title="powerups_title" title="Способности">⚡</button>
+          <button id="btn-lucky-spin" class="btn btn-lucky-spin" data-i18n-title="spin_title" title="Крутить рулетку">🎰 (<span id="spin-cost">200</span>)</button>
+          <button id="btn-game-menu" class="btn btn-secondary" data-i18n="btn_exit_menu">Выйти в меню</button>
+          <button id="btn-restart" class="btn btn-secondary" data-i18n="btn_restart">Заново</button>
         </div>
       </div>
 
@@ -155,30 +137,30 @@
       <div class="game-sidebar game-sidebar-right">
         <div class="shapes-row">
           <div class="shape-slot">
-            <span class="shape-slot-label">Запас</span>
+            <span class="shape-slot-label" data-i18n="hold">Запас</span>
             <div id="hold-shape-container" class="shape-container hold-container">
               <canvas id="hold-canvas" width="90" height="90"></canvas>
             </div>
           </div>
           <div class="shape-slot shape-slot-main">
-            <span class="shape-slot-label">Фигура</span>
+            <span class="shape-slot-label" data-i18n="piece">Фигура</span>
             <div id="current-shape-container" class="shape-container current-container">
               <canvas id="current-shape-canvas" width="90" height="90"></canvas>
             </div>
             <div class="shape-actions">
-              <button id="btn-rotate" class="btn btn-icon" title="Повернуть">↻</button>
-              <button id="btn-undo" class="btn btn-icon btn-undo" title="Отмена">↩ <span id="undo-count" class="undo-count">3</span></button>
-              <button id="btn-undo-ad" class="btn btn-icon btn-undo-ad" title="Ещё возвраты" style="display:none">▶</button>
+              <button id="btn-rotate" class="btn btn-icon" data-i18n-title="rotate_title" title="Повернуть">↻</button>
+              <button id="btn-undo" class="btn btn-icon btn-undo" data-i18n-title="undo_title" title="Отмена">↩ <span id="undo-count" class="undo-count">3</span></button>
+              <button id="btn-undo-ad" class="btn btn-icon btn-undo-ad" data-i18n-title="undo_ad_title" title="Ещё возвраты" style="display:none">▶</button>
             </div>
           </div>
           <div class="shape-slot">
-            <span class="shape-slot-label">Далее</span>
+            <span class="shape-slot-label" data-i18n="next">Далее</span>
             <div class="shape-container next-container">
               <canvas id="next-canvas" width="90" height="90"></canvas>
             </div>
           </div>
           <div class="shape-slot shape-slot-small">
-            <span class="shape-slot-label">Потом</span>
+            <span class="shape-slot-label" data-i18n="next2">Потом</span>
             <div class="shape-container next2-container">
               <canvas id="next2-canvas" width="60" height="60"></canvas>
             </div>
@@ -188,193 +170,193 @@
 
       <!-- Power-up shop popup -->
       <div id="powerup-shop" class="powerup-shop hidden">
-        <button class="powerup-btn" data-power="clearRow">🔥 Очистить ряд <span class="powerup-price">250</span></button>
-        <button class="powerup-btn" data-power="clearCol">🔥 Очистить столбец <span class="powerup-price">250</span></button>
-        <button class="powerup-btn" data-power="bomb">💣 Бомба <span class="powerup-price">200</span></button>
-        <button class="powerup-btn" data-power="shuffle">🔄 Новая фигура <span class="powerup-price">150</span></button>
+        <button class="powerup-btn" data-power="clearRow">🔥 <span data-i18n="powerup_clear_row">Очистить ряд</span> <span class="powerup-price">250</span></button>
+        <button class="powerup-btn" data-power="clearCol">🔥 <span data-i18n="powerup_clear_col">Очистить столбец</span> <span class="powerup-price">250</span></button>
+        <button class="powerup-btn" data-power="bomb">💣 <span data-i18n="powerup_bomb">Бомба</span> <span class="powerup-price">200</span></button>
+        <button class="powerup-btn" data-power="shuffle">🔄 <span data-i18n="powerup_shuffle">Новая фигура</span> <span class="powerup-price">150</span></button>
       </div>
     </div>
 
     <!-- Победа уровня -->
     <div id="screen-level-win" class="screen">
       <div class="modal-content">
-        <h2>Уровень пройден!</h2>
-        <p>Очки: <span id="win-score">0</span></p>
+        <h2 data-i18n="level_complete">Уровень пройден!</h2>
+        <p><span data-i18n="win_score">Очки:</span> <span id="win-score">0</span></p>
         <div id="win-unlocks" class="win-unlocks" style="display: none;"></div>
-        <button id="btn-next-level" class="btn btn-primary">Следующий уровень</button>
+        <button id="btn-next-level" class="btn btn-primary" data-i18n="btn_next_level">Следующий уровень</button>
       </div>
     </div>
 
     <!-- Game Over -->
     <div id="screen-gameover" class="screen">
       <div class="modal-content">
-        <h2>Нет хода</h2>
-        <p>Фигуру поставить некуда. Очки: <span id="gameover-score">0</span></p>
-        <button id="btn-retry" class="btn btn-primary">Заново</button>
-        <button id="btn-to-menu" class="btn btn-secondary">В меню</button>
+        <h2 data-i18n="gameover_title">Нет хода</h2>
+        <p><span data-i18n="gameover_text">Фигуру поставить некуда. Очки:</span> <span id="gameover-score">0</span></p>
+        <button id="btn-retry" class="btn btn-primary" data-i18n="btn_retry">Заново</button>
+        <button id="btn-to-menu" class="btn btn-secondary" data-i18n="btn_to_menu">В меню</button>
       </div>
     </div>
 
     <!-- Магазин скинов -->
     <div id="screen-shop" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Магазин блоков</h2>
-        <p class="shop-coins">Монеты: <span id="shop-coins">0</span></p>
+        <h2 data-i18n="shop_title">Магазин блоков</h2>
+        <p class="shop-coins"><span data-i18n="coins">Монеты:</span> <span id="shop-coins">0</span></p>
         <div id="shop-list" class="shop-list"></div>
-        <button id="btn-shop-back" class="btn btn-primary">Назад</button>
+        <button id="btn-shop-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Достижения -->
     <div id="screen-achievements" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Достижения</h2>
+        <h2 data-i18n="achievements_title">Достижения</h2>
         <div id="achievements-grid" class="achievements-grid"></div>
-        <button id="btn-achievements-back" class="btn btn-primary">Назад</button>
+        <button id="btn-achievements-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Выбор темы -->
     <div id="screen-themes" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Выбор темы</h2>
-        <p class="theme-hint">Разблокируй темы через достижения</p>
+        <h2 data-i18n="themes_title">Выбор темы</h2>
+        <p class="theme-hint" data-i18n="themes_hint">Разблокируй темы через достижения</p>
         <div id="themes-grid" class="themes-grid"></div>
-        <button id="btn-themes-back" class="btn btn-primary">Назад</button>
+        <button id="btn-themes-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Ежедневные задания -->
     <div id="screen-challenges" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Ежедневные задания</h2>
+        <h2 data-i18n="challenges_title">Ежедневные задания</h2>
         <div id="challenges-list" class="challenges-list"></div>
-        <button id="btn-challenges-back" class="btn btn-primary">Назад</button>
+        <button id="btn-challenges-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Рейтинг -->
     <div id="screen-leaderboard" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Рейтинг недели</h2>
+        <h2 data-i18n="leaderboard_title">Рейтинг недели</h2>
         <div id="leaderboard-list" class="leaderboard-list"></div>
-        <button id="btn-leaderboard-back" class="btn btn-primary">Назад</button>
+        <button id="btn-leaderboard-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Выбор Time Attack -->
     <div id="screen-time-attack" class="screen">
       <div class="modal-content">
-        <h2>Режим Таймер</h2>
-        <p>Очисти максимум линий за ограниченное время!</p>
-        <button id="btn-ta-60" class="btn btn-primary">60 секунд</button>
-        <button id="btn-ta-120" class="btn btn-secondary">120 секунд</button>
-        <button id="btn-ta-back" class="btn btn-secondary">Назад</button>
+        <h2 data-i18n="timeattack_title">Режим Таймер</h2>
+        <p data-i18n="timeattack_desc">Очисти максимум линий за ограниченное время!</p>
+        <button id="btn-ta-60" class="btn btn-primary" data-i18n="ta_60">60 секунд</button>
+        <button id="btn-ta-120" class="btn btn-secondary" data-i18n="ta_120">120 секунд</button>
+        <button id="btn-ta-back" class="btn btn-secondary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Инструкции -->
     <div id="screen-instructions" class="screen">
       <div class="modal-content modal-content--wide instructions-content">
-        <h2>Как играть</h2>
+        <h2 data-i18n="btn_howto">Как играть</h2>
         <div class="instructions-sections">
           <div class="instruction-block">
             <div class="instruction-icon">🧩</div>
-            <h3>Основы</h3>
-            <p>Размещай фигуры на поле 10×10. Заполни целую строку или столбец — и они очистятся! 17 разных фигур: классические тетромино, кресты, ступеньки, U-образные и другие.</p>
+            <h3 data-i18n="instr_basics_title">Основы</h3>
+            <p data-i18n="instr_basics_desc">Размещай фигуры на поле 10×10. Заполни целую строку или столбец — и они очистятся!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🎯</div>
-            <h3>Цель</h3>
-            <p>Очищай нужное количество линий, чтобы пройти уровень. С каждым уровнем цель растёт.</p>
+            <h3 data-i18n="instr_goal_title">Цель</h3>
+            <p data-i18n="instr_goal_desc">Очищай нужное количество линий, чтобы пройти уровень.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🔥</div>
-            <h3>Комбо и Fever</h3>
-            <p>Очищай линии подряд — комбо увеличивает очки! 4 комбо подряд = Fever Mode (x3 очков на 20 сек).</p>
+            <h3 data-i18n="instr_combo_title">Комбо и Fever</h3>
+            <p data-i18n="instr_combo_desc">Очищай линии подряд — комбо увеличивает очки!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">↻</div>
-            <h3>Поворот</h3>
-            <p>Нажми кнопку ↻ чтобы повернуть текущую фигуру на 90°.</p>
+            <h3 data-i18n="instr_rotate_title">Поворот</h3>
+            <p data-i18n="instr_rotate_desc">Нажми кнопку ↻ чтобы повернуть текущую фигуру на 90°.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">📦</div>
-            <h3>Запас (Hold)</h3>
-            <p>Нажми на ячейку «Запас» чтобы сохранить фигуру на потом. Можно менять 1 раз за ход.</p>
+            <h3 data-i18n="instr_hold_title">Запас (Hold)</h3>
+            <p data-i18n="instr_hold_desc">Нажми на ячейку «Запас» чтобы сохранить фигуру на потом.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">↩</div>
-            <h3>Отмена (Undo)</h3>
-            <p>3 бесплатных отмены за игру. Ещё 3 — после просмотра рекламы.</p>
+            <h3 data-i18n="instr_undo_title">Отмена (Undo)</h3>
+            <p data-i18n="instr_undo_desc">3 бесплатных отмены за игру. Ещё 3 — после просмотра рекламы.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">💣</div>
-            <h3>Бомбы</h3>
-            <p>Редко выпадает бомба — одноклеточный взрыв, очищающий область 3x3! Также можно купить бомбу за 200 монет в магазине способностей — она заменит текущую фигуру.</p>
+            <h3 data-i18n="instr_bombs_title">Бомбы</h3>
+            <p data-i18n="instr_bombs_desc">Редко выпадает бомба — одноклеточный взрыв, очищающий область 3x3!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">⭐</div>
-            <h3>Звёзды</h3>
-            <p>На поле появляются звёзды. Накрой их фигурой — получишь 50 бонусных монет за каждую!</p>
+            <h3 data-i18n="instr_stars_title">Звёзды</h3>
+            <p data-i18n="instr_stars_desc">На поле появляются звёзды. Накрой их фигурой — получишь 50 бонусных монет!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🧲</div>
-            <h3>Магнит</h3>
-            <p>Очень редкий спецблок — при размещении все блоки на поле падают вниз, уплотняя поле!</p>
+            <h3 data-i18n="instr_magnet_title">Магнит</h3>
+            <p data-i18n="instr_magnet_desc">Очень редкий спецблок — при размещении все блоки падают вниз!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🧊</div>
-            <h3>Замороженные блоки</h3>
-            <p>С уровня 7 на поле появляются ледяные блоки. Нужно 2 очищения линии чтобы убрать!</p>
+            <h3 data-i18n="instr_frozen_title">Замороженные блоки</h3>
+            <p data-i18n="instr_frozen_desc">С уровня 7 появляются ледяные блоки. Нужно 2 очищения линии чтобы убрать!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">⬇️</div>
-            <h3>Гравитация и Каскад</h3>
-            <p>Особый режим: блоки падают вниз после каждого хода. Если после падения собирается ещё одна линия — она очистится автоматически (каскад)!</p>
+            <h3 data-i18n="instr_gravity_title">Гравитация и Каскад</h3>
+            <p data-i18n="instr_gravity_desc">Блоки падают вниз после каждого хода. Каскадные очистки!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🎰</div>
-            <h3>Рулетка</h3>
-            <p>Потрать 300 монет на случайный бонус: дополнительный undo, бомба, звёзды, монеты или Fever Mode!</p>
+            <h3 data-i18n="instr_spin_title">Рулетка</h3>
+            <p data-i18n="instr_spin_desc">Потрать монеты на случайный бонус!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">⏱️</div>
-            <h3>Режим Таймер</h3>
-            <p>Очисти максимум линий за 60 или 120 секунд. Без уровней — чистый счёт!</p>
+            <h3 data-i18n="instr_timer_title">Режим Таймер</h3>
+            <p data-i18n="instr_timer_desc">Очисти максимум линий за 60 или 120 секунд.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">⚡</div>
-            <h3>Способности</h3>
-            <p>Купи способность за монеты прямо в игре: очистить ряд (250), столбец (250), бомбу (200) или новую фигуру (150)!</p>
+            <h3 data-i18n="instr_powerups_title">Способности</h3>
+            <p data-i18n="instr_powerups_desc">Купи способность за монеты прямо в игре!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">♾️</div>
-            <h3>Бесконечный режим</h3>
-            <p>Без уровней — играй, пока есть ходы. Набери максимальный счёт!</p>
+            <h3 data-i18n="instr_endless_title">Бесконечный режим</h3>
+            <p data-i18n="instr_endless_desc">Без уровней — играй, пока есть ходы.</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">🧩</div>
-            <h3>Головоломки</h3>
-            <p>Очисти готовое поле за ограниченное число ходов! 10 головоломок с наградами в монетах.</p>
+            <h3 data-i18n="instr_puzzles_title">Головоломки</h3>
+            <p data-i18n="instr_puzzles_desc">Очисти готовое поле за ограниченное число ходов!</p>
           </div>
           <div class="instruction-block">
             <div class="instruction-icon">📅</div>
-            <h3>Ежедневный стрик</h3>
-            <p>Заходи каждый день — бонус растёт 7 дней подряд! От 30 до 500 монет. Пропустишь день — стрик сбросится.</p>
+            <h3 data-i18n="instr_streak_title">Ежедневный стрик</h3>
+            <p data-i18n="instr_streak_desc">Заходи каждый день — бонус растёт!</p>
           </div>
         </div>
-        <button id="btn-instructions-back" class="btn btn-primary">Назад</button>
+        <button id="btn-instructions-back" class="btn btn-primary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
     <!-- Головоломки -->
     <div id="screen-puzzles" class="screen">
       <div class="modal-content modal-content--wide">
-        <h2>Головоломки</h2>
-        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:12px">Очисти поле за ограниченное число ходов!</p>
+        <h2 data-i18n="puzzles_title">Головоломки</h2>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:12px" data-i18n="puzzles_desc">Очисти поле за ограниченное число ходов!</p>
         <div id="puzzle-list" class="puzzle-grid"></div>
-        <button id="btn-puzzles-back" class="btn btn-secondary">Назад</button>
+        <button id="btn-puzzles-back" class="btn btn-secondary" data-i18n="btn_back">Назад</button>
       </div>
     </div>
 
@@ -390,9 +372,9 @@
     <div id="daily-bonus-popup" class="daily-bonus-popup hidden">
       <div class="daily-bonus-card">
         <div class="daily-bonus-icon">🎁</div>
-        <div class="daily-bonus-title">Ежедневный бонус!</div>
+        <div class="daily-bonus-title" data-i18n="daily_bonus_title">Ежедневный бонус!</div>
         <div id="daily-bonus-amount" class="daily-bonus-amount">+25</div>
-        <div class="daily-bonus-subtitle">монет</div>
+        <div class="daily-bonus-subtitle" data-i18n="daily_bonus_coins">монет</div>
       </div>
     </div>
 
@@ -408,6 +390,7 @@
       </div>
     </div>
   </div>
+  <script src="src/i18n.js"></script>
   <script src="src/config.js"></script>
   <script src="src/shapes.js"></script>
   <script src="src/game.js"></script>
