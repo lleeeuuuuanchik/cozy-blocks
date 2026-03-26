@@ -46,6 +46,7 @@ var I18N = {
     ru: {
       title: 'Уютные блоки',
       subtitle: 'Собирай линии и проходи уровни',
+      loading: 'Загрузка...',
 
       // Menu
       btn_play: 'Играть',
@@ -341,6 +342,7 @@ var I18N = {
     en: {
       title: 'Cozy Blocks',
       subtitle: 'Collect lines and complete levels',
+      loading: 'Loading...',
 
       btn_play: 'Play',
       btn_endless: 'Endless',

@@ -1294,25 +1294,39 @@
     Progress.load();
     applyThemeCSS(Progress.data.selectedTheme || 'default');
     Game.init(false);
-    if (typeof YandexSDK !== 'undefined') {
-      YandexSDK.init(function () {});
-      YandexSDK.onPauseResume(pauseGame, resumeGame);
-    }
-    // Начальная локализация DOM (до SDK, используется язык по умолчанию или уже определённый)
+    // Начальная локализация DOM (до SDK, используется язык по умолчанию)
     if (typeof I18N !== 'undefined') I18N.applyToDOM();
+
+    // Инициализация подсистем
     Render.init();
     Render.drawAll();
     Render.updateUI();
     if (typeof Particles !== 'undefined') Particles.init();
     if (typeof Dialogue !== 'undefined') Dialogue.init();
     if (typeof DragDrop !== 'undefined') DragDrop.init(onPlaceSuccess);
-    showScreen('screen-menu');
-    if (typeof YandexSDK !== 'undefined') YandexSDK.notifyReady();
 
-    // Login streak check (replaces old daily bonus)
-    var streakResult = Progress.checkLoginStreak();
-    if (streakResult.isNew && streakResult.reward > 0) {
-      showStreakCalendar(streakResult);
+    // Функция завершения загрузки: показать меню и сообщить платформе
+    function finishLoading() {
+      showScreen('screen-menu');
+      if (typeof YandexSDK !== 'undefined') YandexSDK.notifyReady();
+
+      // Login streak check (replaces old daily bonus)
+      var streakResult = Progress.checkLoginStreak();
+      if (streakResult.isNew && streakResult.reward > 0) {
+        showStreakCalendar(streakResult);
+      }
+    }
+
+    // Инициализация SDK: ждём завершения, затем показываем меню
+    if (typeof YandexSDK !== 'undefined') {
+      YandexSDK.onPauseResume(pauseGame, resumeGame);
+      YandexSDK.init(function () {
+        // SDK готов (или недоступен) — переходим к меню
+        if (typeof I18N !== 'undefined') I18N.applyToDOM();
+        finishLoading();
+      });
+    } else {
+      finishLoading();
     }
   }
 

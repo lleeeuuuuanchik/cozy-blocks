@@ -59,6 +59,7 @@ var YandexSDK = {
   notifyReady: function () {
     if (this.ysdk && this.ysdk.features && this.ysdk.features.LoadingAPI) {
       this.ysdk.features.LoadingAPI.ready();
+      this._pendingNotifyReady = false;
     } else {
       this._pendingNotifyReady = true;
     }
